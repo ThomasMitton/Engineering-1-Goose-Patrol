@@ -1,4 +1,4 @@
-# engineering-1-github.io
+# Goose Patrol
 Group project
 
 Thomas :)
