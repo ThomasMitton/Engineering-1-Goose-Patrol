@@ -1,7 +1,8 @@
-# engineering-1-github.io
+# Goose Patrol
 ENG1 Group Project
 ## Team Members
 - Thomas :)
-- Albert 
+- Albert
 - Luke :)
+- Maddie
 - Freddie
