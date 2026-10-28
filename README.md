@@ -1,6 +1,7 @@
 # engineering-1-github.io
-Group project
-
-Thomas :)
-Albert 
-Luke :)
+ENG1 Group Project
+## Team Members
+- Thomas :)
+- Albert 
+- Luke :)
+- Freddie
