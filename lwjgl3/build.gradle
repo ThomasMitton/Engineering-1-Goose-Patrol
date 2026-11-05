@@ -19,7 +19,7 @@ apply plugin: 'io.github.fourlastor.construo'
 import io.github.fourlastor.construo.Target
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
-application.mainClass = 'goosepatrol.york.ac.uk.lwjgl3.Lwjgl3Launcher'
+application.mainClass = 'Goose_Patrol.york.ac.uk.lwjgl3.Lwjgl3Launcher'
 application.applicationName = appName
 eclipse.project.name = appName + '-lwjgl3'
 java.sourceCompatibility = 17
@@ -30,11 +30,13 @@ if (JavaVersion.current().isJava9Compatible()) {
 
 dependencies {
   implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   implementation project(':core')
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
+      implementation "io.github.berstanio:gdx-svmhelper-extension-box2d:$graalHelperVersion"
 
   }
   // Forces LWJGL3 to use at least $lwjgl3Version, currently 3.4.3, to avoid warnings on Java 25 and up.
@@ -149,7 +151,7 @@ construo {
       architecture.set(Target.Architecture.AARCH64)
       jdkUrl.set("https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.10%2B7/OpenJDK21U-jdk_aarch64_mac_hotspot_21.0.10_7.tar.gz")
       // macOS needs an identifier
-      identifier.set("goosepatrol.york.ac.uk." + appName)
+      identifier.set("Goose_Patrol.york.ac.uk." + appName)
       // Optional: icon for macOS, as an ICNS file
       macIcon.set(project.file("icons/logo.icns"))
     }
@@ -157,7 +159,7 @@ construo {
       architecture.set(Target.Architecture.X86_64)
       jdkUrl.set("https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.10%2B7/OpenJDK21U-jdk_x64_mac_hotspot_21.0.10_7.tar.gz")
       // macOS needs an identifier
-      identifier.set("goosepatrol.york.ac.uk." + appName)
+      identifier.set("Goose_Patrol.york.ac.uk." + appName)
       // Optional: icon for macOS, as an ICNS file
       macIcon.set(project.file("icons/logo.icns"))
     }
