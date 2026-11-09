@@ -3,6 +3,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 
 
 public class Player {
@@ -32,6 +33,9 @@ public class Player {
         if(Gdx.input.isKeyPressed(Input.Keys.D)){
             x += deltaSpeed;
         }
+    }
+    public Vector2 getVector() {
+        return new Vector2(x, y);
     }
 
     public void render(SpriteBatch batch) {

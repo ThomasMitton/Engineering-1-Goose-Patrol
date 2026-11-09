@@ -1,3 +1,4 @@
 .gitkeep
+Goose.png
 Player.png
 libgdx.png
