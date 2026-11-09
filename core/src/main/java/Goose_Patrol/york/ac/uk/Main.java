@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
+import static com.badlogic.gdx.Gdx.app;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
@@ -29,6 +30,11 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void render() {
+        if (player.hitbox.overlaps(goose.hitbox)) {
+            app.log("Collision","You died!");
+            // TODO: Decrease health when hit
+        }
+
         ScreenUtils.clear(1f, 1f, 1f, 1f);
         player.update();
         goose.update(player.getVector());
