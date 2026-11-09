@@ -19,7 +19,7 @@ public class Main extends ApplicationAdapter {
     @Override
     public void create() {
         batch = new SpriteBatch();
-        player = new Player("Player.png", 140f, 210f, 200f);
+        player = new Player("Player.png", new Vector2(140, 210), 200f);
         goose = new Goose("Goose.png", new Vector2());
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
