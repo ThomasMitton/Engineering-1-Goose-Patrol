@@ -22,6 +22,8 @@ public class Main extends ApplicationAdapter {
     private String myText;
     private Timer timer;
     private String displayTime;
+    private HealthBar health_bar;
+    private ItemCounter ItemCounter;
 
     @Override
     public void create() {
@@ -41,6 +43,9 @@ public class Main extends ApplicationAdapter {
         );
 
         map = new Texture(Gdx.files.internal("map.png"));
+        
+        health_bar = new HealthBar();
+        ItemCounter = new ItemCounter(batch);
     }
 
     @Override
@@ -48,6 +53,7 @@ public class Main extends ApplicationAdapter {
         if (player.hitbox.overlaps(goose.hitbox)) {
             app.log("Collision","You died!");
             // TODO: Decrease health when hit
+            health_bar.health = health_bar.health - 1;
         }
 
         ScreenUtils.clear(1f, 1f, 1f, 1f);
@@ -98,6 +104,14 @@ public class Main extends ApplicationAdapter {
         );
 
         batch.end();
+        
+        health_bar.display();
+        
+        batch.begin();
+        
+        ItemCounter.display();
+        
+        batch.end();
     }
 
     @Override
@@ -112,5 +126,7 @@ public class Main extends ApplicationAdapter {
         goose.dispose();
         map.dispose();
         font.dispose();
+        health_bar.dispose();
+        ItemCounter.dispose();
     }
 }
