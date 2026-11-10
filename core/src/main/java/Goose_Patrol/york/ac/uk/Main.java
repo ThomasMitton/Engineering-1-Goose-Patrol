@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import static com.badlogic.gdx.Gdx.app;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -18,11 +17,11 @@ public class Main extends ApplicationAdapter {
     private Goose goose;
     private Texture map;
     private OrthographicCamera camera;
+    private OrthographicCamera uiCamera;
     private BitmapFont font;
     private String myText;
     private Timer timer;
     private String displayTime;
-
 
     @Override
     public void create() {
@@ -33,6 +32,13 @@ public class Main extends ApplicationAdapter {
         camera.setToOrtho(false, 800, 600);
         font = new BitmapFont(Gdx.files.internal("Open Sans.fnt"));
         displayTime = Timer.refreshTimer();
+
+        uiCamera = new OrthographicCamera();
+        uiCamera.setToOrtho(
+            false,
+            Gdx.graphics.getWidth(),
+            Gdx.graphics.getHeight()
+        );
 
         map = new Texture(Gdx.files.internal("map.png"));
     }
@@ -73,10 +79,30 @@ public class Main extends ApplicationAdapter {
         batch.end();
         batch.begin();
         displayTime = Timer.refreshTimer();
-        //font.draw(batch, displayTime, Gdx.graphics.getWidth()-200, Gdx.graphics.getHeight()-50);
         player.render(batch);
         goose.render(batch);
         batch.end();
+
+        uiCamera.update();
+        batch.setProjectionMatrix(uiCamera.combined);
+
+        batch.begin();
+
+        displayTime = Timer.refreshTimer();
+
+        font.draw(
+            batch,
+            displayTime,
+            Gdx.graphics.getWidth() - 200,
+            Gdx.graphics.getHeight() - 50
+        );
+
+        batch.end();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        uiCamera.setToOrtho(false, width, height);
     }
 
     @Override
@@ -85,5 +111,6 @@ public class Main extends ApplicationAdapter {
         player.dispose();
         goose.dispose();
         map.dispose();
+        font.dispose();
     }
 }
