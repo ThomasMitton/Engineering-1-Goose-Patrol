@@ -24,6 +24,7 @@ public class Main extends ApplicationAdapter {
     private String displayTime;
     private HealthBar health_bar;
     private ItemCounter ItemCounter;
+    private GameOver GameOver;
 
     @Override
     public void create() {
@@ -46,6 +47,7 @@ public class Main extends ApplicationAdapter {
         
         health_bar = new HealthBar();
         ItemCounter = new ItemCounter(batch);
+        GameOver = new GameOver(health_bar);
     }
 
     @Override
@@ -112,6 +114,8 @@ public class Main extends ApplicationAdapter {
         ItemCounter.display();
         
         batch.end();
+        
+        GameOver.display();
     }
 
     @Override
