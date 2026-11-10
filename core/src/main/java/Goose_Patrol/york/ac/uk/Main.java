@@ -16,12 +16,14 @@ public class Main extends ApplicationAdapter {
     private Goose goose;
     private Texture map;
     private OrthographicCamera camera;
+    private Wall wall;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
         player = new Player("Player.png", new Vector2(140, 210), 200f);
         goose = new Goose("Goose.png", new Vector2());
+        wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
 
@@ -35,6 +37,10 @@ public class Main extends ApplicationAdapter {
             // TODO: Decrease health when hit
         }
 
+        if (player.hitbox.overlaps(wall.hitbox)) {
+            app.log("Collision", "WALL");
+            // TODO: Can't walk through walls
+        }
         ScreenUtils.clear(1f, 1f, 1f, 1f);
         player.update();
         goose.update(player.getVector());
@@ -60,11 +66,9 @@ public class Main extends ApplicationAdapter {
         batch.begin();
 
         batch.draw(map, 0, 0, 2270, 1182);
-
-        batch.end();
-        batch.begin();
         player.render(batch);
         goose.render(batch);
+        wall.render(batch);
         batch.end();
     }
 
@@ -74,5 +78,6 @@ public class Main extends ApplicationAdapter {
         player.dispose();
         goose.dispose();
         map.dispose();
+        wall.dispose();
     }
 }

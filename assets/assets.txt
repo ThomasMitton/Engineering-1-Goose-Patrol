@@ -1,5 +1,8 @@
 .gitkeep
 Goose.png
+Open Sans.fnt
+Open Sans.png
 Player.png
+Wall.png
 libgdx.png
 map.png
