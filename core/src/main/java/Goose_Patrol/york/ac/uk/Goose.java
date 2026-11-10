@@ -1,7 +1,5 @@
 package Goose_Patrol.york.ac.uk;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
 public class Goose extends Entity{
@@ -14,6 +12,8 @@ public class Goose extends Entity{
 
         float targetX = targetPos.x;
         float targetY = targetPos.y;
+
+        super.hitbox();
 
         if (pos.x < targetX) {
             pos.x++;

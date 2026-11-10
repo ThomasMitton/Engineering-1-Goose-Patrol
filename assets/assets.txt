@@ -2,3 +2,4 @@
 Goose.png
 Player.png
 libgdx.png
+map.png
