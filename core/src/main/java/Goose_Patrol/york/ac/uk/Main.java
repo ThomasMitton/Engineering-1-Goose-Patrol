@@ -31,6 +31,7 @@ public class Main extends ApplicationAdapter {
     private String displayTime;
     private HealthBar health_bar;
     private ItemCounter ItemCounter;
+    private GameOver GameOver;
     private Stage inventory;
     private Texture inventoryImage;
     private Wall wall;
@@ -60,13 +61,6 @@ public class Main extends ApplicationAdapter {
 
         health_bar = new HealthBar();
         ItemCounter = new ItemCounter(batch);
-
-        inventory = new Stage(new ScreenViewport());
-        inventoryImage = new Texture(Gdx.files.internal("inventory.png"));
-        Image image1 = new Image(inventoryImage);
-        image1.setSize(127, 63);
-        image1.setPosition(((float) Gdx.graphics.getWidth() / 2) - 64, 10);
-        inventory.addActor(image1);
     }
 
     @Override
@@ -98,16 +92,17 @@ public class Main extends ApplicationAdapter {
         }
 
         camera.position.set(
-            MathUtils.clamp(
-                player.getVector().x,
-                camera.viewportWidth / 2,
-                map.getWidth() - camera.viewportWidth / 2
-            ),
-            MathUtils.clamp(
-                player.getVector().y,
-                camera.viewportHeight / 2,
-                map.getHeight() - camera.viewportHeight / 2
-            ),
+            MathUtils.clamp(MathUtils.clamp(
+                camera.position.x,
+                player.getVector().x - (camera.viewportWidth / 3) + player.texture.getWidth(),
+                player.getVector().x + (camera.viewportWidth / 3)
+            ), camera.viewportWidth / 2, map.getWidth() - camera.viewportWidth / 2),
+
+            MathUtils.clamp(MathUtils.clamp(
+                camera.position.y,
+                player.getVector().y - (camera.viewportHeight / 3) + player.texture.getHeight(),
+                player.getVector().y + (camera.viewportHeight / 3)
+            ), camera.viewportHeight / 2, map.getHeight() - camera.viewportHeight / 2),
             0
         );
 
@@ -130,6 +125,9 @@ public class Main extends ApplicationAdapter {
         }
         wall.render(batch);
 
+        uiCamera.update();
+        batch.setProjectionMatrix(uiCamera.combined);
+
         font.draw(
             batch,
             displayTime,
@@ -137,11 +135,7 @@ public class Main extends ApplicationAdapter {
             Gdx.graphics.getHeight() - 50
         );
 
-        batch.end();
-
         health_bar.display();
-
-        batch.begin();
 
         ItemCounter.display();
 
@@ -150,6 +144,8 @@ public class Main extends ApplicationAdapter {
 
 
         batch.end();
+
+        GameOver.display();
     }
 
     @Override
