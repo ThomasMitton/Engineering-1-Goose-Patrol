@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import static com.badlogic.gdx.Gdx.app;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.List;
@@ -33,6 +34,7 @@ public class Main extends ApplicationAdapter {
     private Stage inventory;
     private Texture inventoryImage;
     private Wall wall;
+    private float duckTimer;
 
     @Override
     public void create() {
@@ -87,7 +89,10 @@ public class Main extends ApplicationAdapter {
             goose.update(player.getVector());
         }
 
-        if (System.currentTimeMillis() % 100 == 0) {
+        float delta = Gdx.graphics.getDeltaTime();
+        duckTimer += delta;
+        if (duckTimer >1f) {
+            duckTimer = 0;
             addGoose();
             app.log("Goose added","big if true");
         }
