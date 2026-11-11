@@ -123,6 +123,9 @@ public class Main extends ApplicationAdapter {
 
         ItemCounter.display();
 
+        inventory.act();
+        inventory.draw();
+
         batch.end();
     }
 
