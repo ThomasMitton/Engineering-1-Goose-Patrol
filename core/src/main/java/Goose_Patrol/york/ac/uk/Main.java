@@ -112,8 +112,6 @@ public class Main extends ApplicationAdapter {
 
         batch.begin();
 
-        displayTime = Timer.refreshTimer();
-
         font.draw(
             batch,
             displayTime,
