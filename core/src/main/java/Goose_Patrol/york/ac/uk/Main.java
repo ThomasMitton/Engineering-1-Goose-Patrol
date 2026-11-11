@@ -39,7 +39,7 @@ public class Main extends ApplicationAdapter {
 
         if (player.hitbox.overlaps(wall.hitbox)) {
             app.log("Collision", "WALL");
-            // TODO: Can't walk through walls
+            wall.checkCollisions(player.pos);
         }
         ScreenUtils.clear(1f, 1f, 1f, 1f);
         player.update();

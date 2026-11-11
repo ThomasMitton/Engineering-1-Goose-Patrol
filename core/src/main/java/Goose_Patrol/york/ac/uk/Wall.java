@@ -13,4 +13,22 @@ public class Wall extends Entity {
         super.hitbox();
     }
 
+    public void checkCollisions(Vector2 targetPos) {
+        if (targetPos.x > pos.x - 64 && targetPos.x < pos.x - 56) {
+            //collision with right side
+            targetPos.x = pos.x - 64;
+        }
+        if (targetPos.x < pos.x + 64 && targetPos.x > pos.x + 56) {
+            //collision with left side
+            targetPos.x = pos.y + 64;
+        }
+        if (targetPos.y < pos.y + 64 && targetPos.y > pos.y + 56) {
+            //collision with top side
+            targetPos.y = pos.y + 64;
+        }
+        if (targetPos.y > pos.y - 64 && targetPos.y < pos.y - 56) {
+            //collision with bottom side
+            targetPos.y = pos.y - 64;
+        }
+    }
 }
