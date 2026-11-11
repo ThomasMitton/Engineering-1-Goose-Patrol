@@ -3,5 +3,7 @@ Goose.png
 Open Sans.fnt
 Open Sans.png
 Player.png
+Wall.png
+inventory.png
 libgdx.png
 map.png
