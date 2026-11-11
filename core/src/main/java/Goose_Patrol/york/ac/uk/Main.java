@@ -29,6 +29,7 @@ public class Main extends ApplicationAdapter {
     private ItemCounter ItemCounter;
     private Stage inventory;
     private Texture inventoryImage;
+    private Wall wall;
 
     @Override
     public void create() {
@@ -36,6 +37,7 @@ public class Main extends ApplicationAdapter {
         batch = new SpriteBatch();
         player = new Player("Player.png", new Vector2(140, 210), 200f, map.getWidth(), map.getHeight());
         goose = new Goose("Goose.png", new Vector2());
+        wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
         font = new BitmapFont(Gdx.files.internal("Open Sans.fnt"));
@@ -49,6 +51,7 @@ public class Main extends ApplicationAdapter {
         );
 
         map = new Texture(Gdx.files.internal("map.png"));
+
 
         health_bar = new HealthBar();
         ItemCounter = new ItemCounter(batch);
@@ -68,6 +71,10 @@ public class Main extends ApplicationAdapter {
             health_bar.health = health_bar.health - 1;
         }
 
+        if (player.hitbox.overlaps(wall.hitbox)) {
+            app.log("Collision", "WALL");
+            wall.checkCollisions(player.pos);
+        }
         ScreenUtils.clear(1f, 1f, 1f, 1f);
         player.update();
         goose.update(player.getVector());
@@ -93,12 +100,11 @@ public class Main extends ApplicationAdapter {
         batch.begin();
 
         batch.draw(map, 0, 0, 2270, 1182);
-
-        batch.end();
-        batch.begin();
         displayTime = Timer.refreshTimer();
         player.render(batch);
         goose.render(batch);
+        wall.render(batch);
+
         batch.end();
 
         uiCamera.update();
@@ -126,6 +132,7 @@ public class Main extends ApplicationAdapter {
         inventory.act();
         inventory.draw();
 
+
         batch.end();
     }
 
@@ -140,6 +147,7 @@ public class Main extends ApplicationAdapter {
         player.dispose();
         goose.dispose();
         map.dispose();
+        wall.dispose();
         font.dispose();
         health_bar.dispose();
         ItemCounter.dispose();
