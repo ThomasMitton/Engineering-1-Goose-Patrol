@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import static com.badlogic.gdx.Gdx.app;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
@@ -16,6 +17,13 @@ public class Main extends ApplicationAdapter {
     private Goose goose;
     private Texture map;
     private OrthographicCamera camera;
+    private OrthographicCamera uiCamera;
+    private BitmapFont font;
+    private String myText;
+    private Timer timer;
+    private String displayTime;
+    private HealthBar health_bar;
+    private ItemCounter ItemCounter;
     private Wall wall;
 
     @Override
@@ -26,8 +34,20 @@ public class Main extends ApplicationAdapter {
         wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
+        font = new BitmapFont(Gdx.files.internal("Open Sans.fnt"));
+        displayTime = Timer.refreshTimer();
+
+        uiCamera = new OrthographicCamera();
+        uiCamera.setToOrtho(
+            false,
+            Gdx.graphics.getWidth(),
+            Gdx.graphics.getHeight()
+        );
 
         map = new Texture(Gdx.files.internal("map.png"));
+
+        health_bar = new HealthBar();
+        ItemCounter = new ItemCounter(batch);
     }
 
     @Override
@@ -35,6 +55,7 @@ public class Main extends ApplicationAdapter {
         if (player.hitbox.overlaps(goose.hitbox)) {
             app.log("Collision","You died!");
             // TODO: Decrease health when hit
+            health_bar.health = health_bar.health - 1;
         }
 
         if (player.hitbox.overlaps(wall.hitbox)) {
@@ -66,10 +87,41 @@ public class Main extends ApplicationAdapter {
         batch.begin();
 
         batch.draw(map, 0, 0, 2270, 1182);
+        displayTime = Timer.refreshTimer();
         player.render(batch);
         goose.render(batch);
         wall.render(batch);
+
         batch.end();
+
+        uiCamera.update();
+        batch.setProjectionMatrix(uiCamera.combined);
+
+        batch.begin();
+
+        displayTime = Timer.refreshTimer();
+
+        font.draw(
+            batch,
+            displayTime,
+            Gdx.graphics.getWidth() - 200,
+            Gdx.graphics.getHeight() - 50
+        );
+
+        batch.end();
+
+        health_bar.display();
+
+        batch.begin();
+
+        ItemCounter.display();
+
+        batch.end();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        uiCamera.setToOrtho(false, width, height);
     }
 
     @Override
@@ -79,5 +131,8 @@ public class Main extends ApplicationAdapter {
         goose.dispose();
         map.dispose();
         wall.dispose();
+        font.dispose();
+        health_bar.dispose();
+        ItemCounter.dispose();
     }
 }
