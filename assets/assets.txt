@@ -3,5 +3,6 @@ Goose.png
 Open Sans.fnt
 Open Sans.png
 Player.png
+beep.mp3
 libgdx.png
 map.png

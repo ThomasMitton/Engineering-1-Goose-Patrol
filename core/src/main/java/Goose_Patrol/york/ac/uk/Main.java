@@ -1,6 +1,8 @@
 package Goose_Patrol.york.ac.uk;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -23,7 +25,12 @@ public class Main extends ApplicationAdapter {
     private Timer timer;
     private String displayTime;
     private HealthBar health_bar;
-    private ItemCounter ItemCounter;
+    private ItemCounter itemCounter;
+    public BreadPoints breadPoints;
+    public static BreadPoints staticBreadPoints;
+    private int pointCounter;
+    public Sound sound;
+
 
     @Override
     public void create() {
@@ -34,6 +41,8 @@ public class Main extends ApplicationAdapter {
         camera.setToOrtho(false, 800, 600);
         font = new BitmapFont(Gdx.files.internal("Open Sans.fnt"));
         displayTime = Timer.refreshTimer();
+        pointCounter = BreadPoints.getCounter();
+        sound = Gdx.audio.newSound(Gdx.files.internal("beep.mp3"));
 
         uiCamera = new OrthographicCamera();
         uiCamera.setToOrtho(
@@ -43,9 +52,9 @@ public class Main extends ApplicationAdapter {
         );
 
         map = new Texture(Gdx.files.internal("map.png"));
-        
+
         health_bar = new HealthBar();
-        ItemCounter = new ItemCounter(batch);
+        itemCounter = new ItemCounter(batch);
     }
 
     @Override
@@ -54,6 +63,10 @@ public class Main extends ApplicationAdapter {
             app.log("Collision","You died!");
             // TODO: Decrease health when hit
             health_bar.health = health_bar.health - 1;
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){ // && goose is in range
+            BreadPoints.feedGoose();
         }
 
         ScreenUtils.clear(1f, 1f, 1f, 1f);
@@ -85,6 +98,7 @@ public class Main extends ApplicationAdapter {
         batch.end();
         batch.begin();
         displayTime = Timer.refreshTimer();
+        pointCounter = BreadPoints.getCounter();
         player.render(batch);
         goose.render(batch);
         batch.end();
@@ -95,6 +109,7 @@ public class Main extends ApplicationAdapter {
         batch.begin();
 
         displayTime = Timer.refreshTimer();
+        pointCounter = BreadPoints.getCounter();
 
         font.draw(
             batch,
@@ -103,14 +118,21 @@ public class Main extends ApplicationAdapter {
             Gdx.graphics.getHeight() - 50
         );
 
+        font.draw(
+            batch,
+            (pointCounter+""),
+            Gdx.graphics.getWidth() - 200,
+            Gdx.graphics.getHeight() - 100
+        );
+
         batch.end();
-        
+
         health_bar.display();
-        
+
         batch.begin();
-        
-        ItemCounter.display();
-        
+
+        itemCounter.display();
+
         batch.end();
     }
 
@@ -127,6 +149,7 @@ public class Main extends ApplicationAdapter {
         map.dispose();
         font.dispose();
         health_bar.dispose();
-        ItemCounter.dispose();
+        itemCounter.dispose();
+        sound.dispose();
     }
 }

@@ -1,21 +1,36 @@
 package Goose_Patrol.york.ac.uk;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
+
+
 public class BreadPoints {
-    public double counter = 0;
+    private static final Sound sound = Gdx.audio.newSound(Gdx.files.internal("beep.mp3"));
+    private static int counter = 20;
 
-    public void increment(){
-        this.counter++;
+    public static void incrementPoints(){
+        counter++;
     }
 
-    public void decrement(){
-        this.counter--;
+    public static void decrementPoints(){
+        if (counter > 0) {
+            counter--;
+        }else{
+            sound.play();
+        }
     }
 
-    public double getCounter(){
+    public static int getCounter(){
         return counter;
     }
 
-    public void resetCounter(){
-        this.counter = 0;
+    public static void resetCounter(){
+        counter = 0;
+    }
+
+    public static void feedGoose(){
+        decrementPoints();
+        //destroy goose
     }
 }
