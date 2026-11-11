@@ -17,16 +17,16 @@ public class Player extends Entity {
 
         float deltaSpeed = speed * Gdx.graphics.getDeltaTime();
 
-        if(Gdx.input.isKeyPressed(Input.Keys.W)){
+        if(Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)){
             pos.y += deltaSpeed;
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.S)){
+        if(Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)){
             pos.y -= deltaSpeed;
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.A)){
+        if(Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)){
             pos.x -= deltaSpeed;
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.D)){
+        if(Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
             pos.x += deltaSpeed;
         }
     }
