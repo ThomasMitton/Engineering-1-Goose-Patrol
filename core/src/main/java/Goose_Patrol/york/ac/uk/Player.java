@@ -6,10 +6,14 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Player extends Entity {
     private final float speed;
+    private final float boundaryX;
+    private final float boundaryY;
 
-    public Player(String texture, Vector2 pos, float speed) {
+    public Player(String texture, Vector2 pos, float speed, int mapWidth, int mapHeight) {
         super(texture, pos);
         this.speed = speed;
+        this.boundaryX = mapWidth;
+        this.boundaryY = mapHeight;
     }
 
     public void update() {
@@ -18,16 +22,32 @@ public class Player extends Entity {
         float deltaSpeed = speed * Gdx.graphics.getDeltaTime();
 
         if(Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)){
-            pos.y += deltaSpeed;
+            if(pos.y + deltaSpeed <= boundaryY - texture.getHeight()){
+                pos.y += deltaSpeed;
+            } else{
+                pos.y = boundaryY - texture.getHeight();
+            }
         }
         if(Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)){
-            pos.y -= deltaSpeed;
+            if(pos.y - deltaSpeed >= 0){
+                pos.y -= deltaSpeed;
+            }else{
+                pos.y = 0;
+            }
         }
         if(Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)){
-            pos.x -= deltaSpeed;
+            if(pos.x - deltaSpeed >= 0){
+                pos.x -= deltaSpeed;
+            }else{
+                pos.x = 0;
+            }
         }
         if(Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
-            pos.x += deltaSpeed;
+            if(pos.x + deltaSpeed <= boundaryX - texture.getWidth()){
+                pos.x += deltaSpeed;
+            }else{
+                pos.x = boundaryX - texture.getWidth();
+            }
         }
     }
 }

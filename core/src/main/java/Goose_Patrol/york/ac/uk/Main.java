@@ -27,8 +27,9 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void create() {
+        map = new Texture(Gdx.files.internal("map.png"));
         batch = new SpriteBatch();
-        player = new Player("Player.png", new Vector2(140, 210), 200f);
+        player = new Player("Player.png", new Vector2(140, 210), 200f, map.getWidth(), map.getHeight());
         goose = new Goose("Goose.png", new Vector2());
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
@@ -41,8 +42,6 @@ public class Main extends ApplicationAdapter {
             Gdx.graphics.getWidth(),
             Gdx.graphics.getHeight()
         );
-
-        map = new Texture(Gdx.files.internal("map.png"));
         
         health_bar = new HealthBar();
         ItemCounter = new ItemCounter(batch);
