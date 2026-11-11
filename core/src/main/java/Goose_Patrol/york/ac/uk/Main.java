@@ -6,9 +6,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.ScreenUtils;
 import static com.badlogic.gdx.Gdx.app;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
@@ -25,12 +28,17 @@ public class Main extends ApplicationAdapter {
     private HealthBar health_bar;
     private ItemCounter ItemCounter;
     private GameOver GameOver;
+    private Stage inventory;
+    private Texture inventoryImage;
+    private Wall wall;
 
     @Override
     public void create() {
+        map = new Texture(Gdx.files.internal("map.png"));
         batch = new SpriteBatch();
-        player = new Player("Player.png", new Vector2(140, 210), 200f);
+        player = new Player("Player.png", new Vector2(140, 210), 200f, map.getWidth(), map.getHeight());
         goose = new Goose("Goose.png", new Vector2());
+        wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
         font = new BitmapFont(Gdx.files.internal("Open Sans.fnt"));
@@ -44,35 +52,39 @@ public class Main extends ApplicationAdapter {
         );
 
         map = new Texture(Gdx.files.internal("map.png"));
-        
+
+
         health_bar = new HealthBar();
         ItemCounter = new ItemCounter(batch);
-        GameOver = new GameOver(health_bar);
     }
 
     @Override
     public void render() {
         if (player.hitbox.overlaps(goose.hitbox)) {
             app.log("Collision","You died!");
-            // TODO: Decrease health when hit
             health_bar.health = health_bar.health - 1;
         }
 
+        if (player.hitbox.overlaps(wall.hitbox)) {
+            app.log("Collision", "WALL");
+            wall.checkCollisions(player.pos);
+        }
         ScreenUtils.clear(1f, 1f, 1f, 1f);
         player.update();
         goose.update(player.getVector());
 
         camera.position.set(
-            MathUtils.clamp(
-                player.getVector().x,
-                camera.viewportWidth / 2,
-                map.getWidth() - camera.viewportWidth / 2
-            ),
-            MathUtils.clamp(
-                player.getVector().y,
-                camera.viewportHeight / 2,
-                map.getHeight() - camera.viewportHeight / 2
-            ),
+            MathUtils.clamp(MathUtils.clamp(
+                camera.position.x,
+                player.getVector().x - (camera.viewportWidth / 3) + player.texture.getWidth(),
+                player.getVector().x + (camera.viewportWidth / 3)
+            ), camera.viewportWidth / 2, map.getWidth() - camera.viewportWidth / 2),
+            
+            MathUtils.clamp(MathUtils.clamp(
+                camera.position.y,
+                player.getVector().y - (camera.viewportHeight / 3) + player.texture.getHeight(),
+                player.getVector().y + (camera.viewportHeight / 3)
+            ), camera.viewportHeight / 2, map.getHeight() - camera.viewportHeight / 2),
             0
         );
 
@@ -83,20 +95,17 @@ public class Main extends ApplicationAdapter {
         batch.begin();
 
         batch.draw(map, 0, 0, 2270, 1182);
-
-        batch.end();
-        batch.begin();
         displayTime = Timer.refreshTimer();
         player.render(batch);
         goose.render(batch);
+        wall.render(batch);
+
         batch.end();
 
         uiCamera.update();
         batch.setProjectionMatrix(uiCamera.combined);
 
         batch.begin();
-
-        displayTime = Timer.refreshTimer();
 
         font.draw(
             batch,
@@ -106,13 +115,17 @@ public class Main extends ApplicationAdapter {
         );
 
         batch.end();
-        
+
         health_bar.display();
-        
+
         batch.begin();
-        
+
         ItemCounter.display();
-        
+
+        inventory.act();
+        inventory.draw();
+
+
         batch.end();
         
         GameOver.display();
@@ -129,8 +142,11 @@ public class Main extends ApplicationAdapter {
         player.dispose();
         goose.dispose();
         map.dispose();
+        wall.dispose();
         font.dispose();
         health_bar.dispose();
         ItemCounter.dispose();
+        inventory.dispose();
+        inventoryImage.dispose();
     }
 }
