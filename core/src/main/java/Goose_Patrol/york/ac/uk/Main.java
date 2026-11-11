@@ -8,16 +8,19 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import static com.badlogic.gdx.Gdx.app;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.util.List;
+
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
     private Player player;
-    private Goose goose;
+    private Array<Goose> gooseArray;
     private Texture map;
     private OrthographicCamera camera;
     private OrthographicCamera uiCamera;
@@ -34,9 +37,9 @@ public class Main extends ApplicationAdapter {
     @Override
     public void create() {
         map = new Texture(Gdx.files.internal("map.png"));
+        gooseArray = new Array<>();
         batch = new SpriteBatch();
         player = new Player("Player.png", new Vector2(140, 210), 200f, map.getWidth(), map.getHeight());
-        goose = new Goose("Goose.png", new Vector2());
         wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
@@ -66,18 +69,28 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void render() {
-        if (player.hitbox.overlaps(goose.hitbox)) {
-            app.log("Collision","You died!");
-            health_bar.health = health_bar.health - 1;
+        for (Goose goose : gooseArray) {
+            if (player.hitbox.overlaps(goose.hitbox)) {
+                gooseArray.removeValue(goose, false);
+                health_bar.health = health_bar.health - 1;
+            }
         }
 
         if (player.hitbox.overlaps(wall.hitbox)) {
             app.log("Collision", "WALL");
             wall.checkCollisions(player.pos);
         }
+
         ScreenUtils.clear(1f, 1f, 1f, 1f);
         player.update();
-        goose.update(player.getVector());
+        for (Goose goose : gooseArray) {
+            goose.update(player.getVector());
+        }
+
+        if (System.currentTimeMillis() % 100 == 0) {
+            addGoose();
+            app.log("Goose added","big if true");
+        }
 
         camera.position.set(
             MathUtils.clamp(
@@ -95,24 +108,22 @@ public class Main extends ApplicationAdapter {
 
         camera.update();
 
+
         batch.setProjectionMatrix(camera.combined);
-
-        batch.begin();
-
-        batch.draw(map, 0, 0, 2270, 1182);
-        displayTime = Timer.refreshTimer();
-        player.render(batch);
-        goose.render(batch);
-        wall.render(batch);
-
-        batch.end();
 
         uiCamera.update();
         batch.setProjectionMatrix(uiCamera.combined);
 
+        displayTime = Timer.refreshTimer();
+
         batch.begin();
 
-        displayTime = Timer.refreshTimer();
+        batch.draw(map, 0, 0, 2270, 1182);
+        player.render(batch);
+        for (Goose goose : gooseArray) {
+            goose.render(batch);
+        }
+        wall.render(batch);
 
         font.draw(
             batch,
@@ -145,7 +156,9 @@ public class Main extends ApplicationAdapter {
     public void dispose() {
         batch.dispose();
         player.dispose();
-        goose.dispose();
+        for (Goose goose : gooseArray) {
+            goose.dispose();
+        }
         map.dispose();
         wall.dispose();
         font.dispose();
@@ -153,5 +166,9 @@ public class Main extends ApplicationAdapter {
         ItemCounter.dispose();
         inventory.dispose();
         inventoryImage.dispose();
+    }
+
+    private void addGoose() {
+        gooseArray.add(new Goose("Goose.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight())))));
     }
 }
