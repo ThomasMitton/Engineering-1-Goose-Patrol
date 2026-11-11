@@ -60,16 +60,17 @@ public class Main extends ApplicationAdapter {
         goose.update(player.getVector());
 
         camera.position.set(
-            MathUtils.clamp(
-                player.getVector().x,
-                camera.viewportWidth / 2,
-                map.getWidth() - camera.viewportWidth / 2
-            ),
-            MathUtils.clamp(
-                player.getVector().y,
-                camera.viewportHeight / 2,
-                map.getHeight() - camera.viewportHeight / 2
-            ),
+            MathUtils.clamp(MathUtils.clamp(
+                camera.position.x,
+                player.getVector().x - (camera.viewportWidth / 3) + player.texture.getWidth(),
+                player.getVector().x + (camera.viewportWidth / 3)
+            ), camera.viewportWidth / 2, map.getWidth() - camera.viewportWidth / 2),
+            
+            MathUtils.clamp(MathUtils.clamp(
+                camera.position.y,
+                player.getVector().y - (camera.viewportHeight / 3) + player.texture.getHeight(),
+                player.getVector().y + (camera.viewportHeight / 3)
+            ), camera.viewportHeight / 2, map.getHeight() - camera.viewportHeight / 2),
             0
         );
 
