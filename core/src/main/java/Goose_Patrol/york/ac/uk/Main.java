@@ -6,9 +6,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.ScreenUtils;
 import static com.badlogic.gdx.Gdx.app;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
@@ -24,6 +27,8 @@ public class Main extends ApplicationAdapter {
     private String displayTime;
     private HealthBar health_bar;
     private ItemCounter ItemCounter;
+    private Stage inventory;
+    private Texture inventoryImage;
 
     @Override
     public void create() {
@@ -43,16 +48,22 @@ public class Main extends ApplicationAdapter {
         );
 
         map = new Texture(Gdx.files.internal("map.png"));
-        
+
         health_bar = new HealthBar();
         ItemCounter = new ItemCounter(batch);
+
+        inventory = new Stage(new ScreenViewport());
+        inventoryImage = new Texture(Gdx.files.internal("inventory.png"));
+        Image image1 = new Image(inventoryImage);
+        image1.setSize(127, 63);
+        image1.setPosition(((float) Gdx.graphics.getWidth() / 2) - 64, 10);
+        inventory.addActor(image1);
     }
 
     @Override
     public void render() {
         if (player.hitbox.overlaps(goose.hitbox)) {
             app.log("Collision","You died!");
-            // TODO: Decrease health when hit
             health_bar.health = health_bar.health - 1;
         }
 
@@ -104,13 +115,16 @@ public class Main extends ApplicationAdapter {
         );
 
         batch.end();
-        
+
         health_bar.display();
-        
+
         batch.begin();
-        
+
         ItemCounter.display();
-        
+
+        inventory.act();
+        inventory.draw();
+
         batch.end();
     }
 
@@ -128,5 +142,7 @@ public class Main extends ApplicationAdapter {
         font.dispose();
         health_bar.dispose();
         ItemCounter.dispose();
+        inventory.dispose();
+        inventoryImage.dispose();
     }
 }
