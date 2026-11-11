@@ -4,6 +4,7 @@ Open Sans.fnt
 Open Sans.png
 Player.png
 Wall.png
+bread.png
 inventory.png
 libgdx.png
 map.png

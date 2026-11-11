@@ -12,10 +12,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import static com.badlogic.gdx.Gdx.app;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
-import java.util.List;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
@@ -31,7 +28,7 @@ public class Main extends ApplicationAdapter {
     private String displayTime;
     private HealthBar health_bar;
     private ItemCounter ItemCounter;
-    private GameOver GameOver;
+    //private GameOver GameOver;
     private Stage inventory;
     private Texture inventoryImage;
     private Wall wall;
@@ -61,6 +58,13 @@ public class Main extends ApplicationAdapter {
 
         health_bar = new HealthBar();
         ItemCounter = new ItemCounter(batch);
+
+        inventory = new Stage(new ScreenViewport());
+        inventoryImage = new Texture(Gdx.files.internal("inventory.png"));
+        Image image1 = new Image(inventoryImage);
+        image1.setSize(127, 63);
+        image1.setPosition(((float) Gdx.graphics.getWidth() / 2) - 64, 10);
+        inventory.addActor(image1);
     }
 
     @Override
@@ -76,7 +80,6 @@ public class Main extends ApplicationAdapter {
             app.log("Collision", "WALL");
             wall.checkCollisions(player.pos);
         }
-
         ScreenUtils.clear(1f, 1f, 1f, 1f);
         player.update();
         for (Goose goose : gooseArray) {
@@ -108,25 +111,24 @@ public class Main extends ApplicationAdapter {
 
         camera.update();
 
-
         batch.setProjectionMatrix(camera.combined);
-
-        uiCamera.update();
-        batch.setProjectionMatrix(uiCamera.combined);
-
-        displayTime = Timer.refreshTimer();
 
         batch.begin();
 
         batch.draw(map, 0, 0, 2270, 1182);
+        displayTime = Timer.refreshTimer();
         player.render(batch);
         for (Goose goose : gooseArray) {
             goose.render(batch);
         }
         wall.render(batch);
 
+        batch.end();
+
         uiCamera.update();
         batch.setProjectionMatrix(uiCamera.combined);
+
+        batch.begin();
 
         font.draw(
             batch,
@@ -135,7 +137,11 @@ public class Main extends ApplicationAdapter {
             Gdx.graphics.getHeight() - 50
         );
 
+        batch.end();
+
         health_bar.display();
+
+        batch.begin();
 
         ItemCounter.display();
 
@@ -145,7 +151,7 @@ public class Main extends ApplicationAdapter {
 
         batch.end();
 
-        GameOver.display();
+        //GameOver.display();
     }
 
     @Override
