@@ -26,6 +26,10 @@ public class ItemCounter {
         font.draw(batch,"Items used: " + itemsUsed, 20, 30);
     }
     
+    public void reset() {
+        itemsUsed = 0;
+    }
+    
     public void dispose() {
         font.dispose();
     }

@@ -1,5 +1,4 @@
 package Goose_Patrol.york.ac.uk;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -11,13 +10,20 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
+
 public class GameOverScreen {
 
     private Stage stage;
     private Skin skin;
     private OrthographicCamera uiCamera;
+    public ResetGame resetGame;
+    private Main game;
+    
+    
+    
 
-    public GameOverScreen() {
+    public GameOverScreen(Main game) {
+        this.game = game;
         //stage setup
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
@@ -36,7 +42,7 @@ public class GameOverScreen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 //add restarting the game
-                Gdx.app.exit();
+                game.resetGame();
             }
         });
 

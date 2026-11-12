@@ -1,5 +1,6 @@
 package Goose_Patrol.york.ac.uk;
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
@@ -29,7 +30,6 @@ public class Main extends ApplicationAdapter {
     private Timer timer;
     private String displayTime;
     private HealthBar health_bar;
-    private ItemCounter itemCounter;
     public BreadPoints breadPoints;
     public static BreadPoints staticBreadPoints;
     private int pointCounter;
@@ -43,10 +43,12 @@ public class Main extends ApplicationAdapter {
     private Texture inventoryImage;
     private Wall wall;
     private float duckTimer;
+    private ResetGame resetGame;
+
 
     @Override
     public void create() {
-        GameOverScreen = new GameOverScreen();
+        GameOverScreen = new GameOverScreen(this);
         map = new Texture(Gdx.files.internal("map.png"));
         gooseArray = new Array<>();
         batch = new SpriteBatch();
@@ -74,6 +76,8 @@ public class Main extends ApplicationAdapter {
         
         ItemCounter = new ItemCounter(batch);
         GameOver = new GameOver(health_bar);
+        resetGame = new ResetGame();
+        
         
 
         inventory = new Stage(new ScreenViewport());
@@ -86,6 +90,9 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void render() {
+        
+        
+        
         for (Goose goose : gooseArray) {
             if (player.hitbox.overlaps(goose.hitbox)) {
                 gooseArray.removeValue(goose, false);
@@ -95,6 +102,8 @@ public class Main extends ApplicationAdapter {
                 }
             }
         }
+        
+        
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){ // && goose is in range
             BreadPoints.feedGoose();
@@ -188,12 +197,13 @@ public class Main extends ApplicationAdapter {
        
 
         batch.end();
-
-        GameOver.display();
-        
         if(gameOver) {
             GameOverScreen.display();
         }
+
+        
+        
+        
     }
 
     @Override
@@ -201,6 +211,12 @@ public class Main extends ApplicationAdapter {
         uiCamera.setToOrtho(false, width, height);
         GameOverScreen.resize(width,height);
     }
+    
+    public void resetGame() {
+        resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, inventory, inventoryImage);
+        gameOver = false;
+         
+     }
 
     @Override
     public void dispose() {
@@ -213,7 +229,7 @@ public class Main extends ApplicationAdapter {
         wall.dispose();
         font.dispose();
         health_bar.dispose();
-        itemCounter.dispose();
+        ItemCounter.dispose();
         sound.dispose();
         ItemCounter.dispose();
         inventory.dispose();
