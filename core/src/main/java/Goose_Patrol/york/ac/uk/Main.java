@@ -34,9 +34,11 @@ public class Main extends ApplicationAdapter {
     public static BreadPoints staticBreadPoints;
     private int pointCounter;
     public Sound sound;
+    private GameOverScreen GameOverScreen;
+    private boolean gameOver = false;
 
     private ItemCounter ItemCounter;
-    //private GameOver GameOver;
+    private GameOver GameOver;
     private Stage inventory;
     private Texture inventoryImage;
     private Wall wall;
@@ -44,6 +46,7 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void create() {
+        GameOverScreen = new GameOverScreen();
         map = new Texture(Gdx.files.internal("map.png"));
         gooseArray = new Array<>();
         batch = new SpriteBatch();
@@ -68,8 +71,10 @@ public class Main extends ApplicationAdapter {
 
 
         health_bar = new HealthBar();
-        itemCounter = new ItemCounter(batch);
+        
         ItemCounter = new ItemCounter(batch);
+        GameOver = new GameOver(health_bar);
+        
 
         inventory = new Stage(new ScreenViewport());
         inventoryImage = new Texture(Gdx.files.internal("inventory.png"));
@@ -85,6 +90,9 @@ public class Main extends ApplicationAdapter {
             if (player.hitbox.overlaps(goose.hitbox)) {
                 gooseArray.removeValue(goose, false);
                 health_bar.health = health_bar.health - 1;
+                if (health_bar.health <=0) {
+                    gameOver = true;
+                }
             }
         }
 
@@ -177,16 +185,21 @@ public class Main extends ApplicationAdapter {
 
 
 
-        itemCounter.display();
+       
 
         batch.end();
 
-        //GameOver.display();
+        GameOver.display();
+        
+        if(gameOver) {
+            GameOverScreen.display();
+        }
     }
 
     @Override
     public void resize(int width, int height) {
         uiCamera.setToOrtho(false, width, height);
+        GameOverScreen.resize(width,height);
     }
 
     @Override
@@ -205,6 +218,7 @@ public class Main extends ApplicationAdapter {
         ItemCounter.dispose();
         inventory.dispose();
         inventoryImage.dispose();
+        GameOverScreen.dispose();
     }
 
     private void addGoose() {
