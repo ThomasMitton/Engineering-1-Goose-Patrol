@@ -63,6 +63,7 @@ public class Main extends ApplicationAdapter {
         image1.setPosition(((float) Gdx.graphics.getWidth() / 2) - 64, 10);
         inventory.addActor(image1);
     }
+    //TODO: Handle logic in update() and rendering in render()
 
     @Override
     public void render() {
@@ -85,7 +86,7 @@ public class Main extends ApplicationAdapter {
                 player.getVector().x - (camera.viewportWidth / 3) + player.texture.getWidth(),
                 player.getVector().x + (camera.viewportWidth / 3)
             ), camera.viewportWidth / 2, map.getWidth() - camera.viewportWidth / 2),
-            
+
             MathUtils.clamp(MathUtils.clamp(
                 camera.position.y,
                 player.getVector().y - (camera.viewportHeight / 3) + player.texture.getHeight(),

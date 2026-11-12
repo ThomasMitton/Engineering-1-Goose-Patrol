@@ -1,10 +1,12 @@
 package Goose_Patrol.york.ac.uk;
+import Goose_Patrol.york.ac.uk.minimap.EntityType;
+import Goose_Patrol.york.ac.uk.minimap.MapEntity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
 
 
-public class Player extends Entity {
+public class Player extends Entity implements MapEntity {
     private final float speed;
     private final float boundaryX;
     private final float boundaryY;
@@ -49,5 +51,17 @@ public class Player extends Entity {
                 pos.x = boundaryX - texture.getWidth();
             }
         }
+    }
+
+    // --- MapEntity implementation ---
+    public Vector2 getPosition() {
+        return super.getVector();
+    }
+     public EntityType getEntityType() {
+        return EntityType.PLAYER;
+    }
+     public boolean isVisibleOnMap() {
+        // TODO: potential unlock for showing player position on map?
+        return true;
     }
 }
