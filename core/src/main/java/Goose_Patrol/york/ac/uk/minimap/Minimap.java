@@ -159,4 +159,14 @@ public class Minimap {
     }
 
     //TODO: Implement methods to allow minimap to be resized with the rest of the window
+    public void resize(int screenWidth, int screenHeight) {
+
+    }
+
+    public void dispose() { //TODO: check everything that should be disposed has been
+        mapTexture.dispose();
+        playerIcon.dispose();
+        gooseIcon.dispose();
+        otherIcon.dispose();
+    }
 }
