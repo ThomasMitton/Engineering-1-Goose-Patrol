@@ -52,7 +52,6 @@ public class Main extends ApplicationAdapter {
 
         map = new Texture(Gdx.files.internal("map.png"));
 
-
         health_bar = new HealthBar();
         ItemCounter = new ItemCounter(batch);
 

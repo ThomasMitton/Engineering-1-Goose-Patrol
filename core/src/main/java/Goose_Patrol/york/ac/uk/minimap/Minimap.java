@@ -18,6 +18,7 @@ public class Minimap {
     private final Texture mapTexture;
     private final Texture playerIcon;
     private final Texture gooseIcon;
+    private final Texture otherIcon;
 
 
     private Array<MapEntity> entities;
@@ -33,15 +34,17 @@ public class Minimap {
 
     private final OrthographicCamera camera;
     private final Viewport viewport;
+    private float worldWidth;
 
     /**
      * Create a new minimap.
      * Shows all entities included in the given list. The map camera only tracks the first entity of EntityType.PLAYER
      * @param mapTexture Texture to be used to represent the main map (should be same size)
-     * @param entities List of MapEntities representing each entity to be rendered on the minimap, should include player
+     * @param entities List of entities representing each entity to be rendered on the minimap, should include player
      * @param sizeX The width on screen of the minimap
      * @param sizeY The height on screen of the minimap
-     * @param minimapPos The position of the bottom-left corner of the minimap
+     * @param minimapPosX The x-coordinate of the bottom-left corner of the minimap
+     * @param minimapPosY The y-coordinate of the bottom-left corner of the minimap
      * @param worldSizeX The width of the game world
      * @param worldSizeY The height of the game world
      * @param zoom Initial zoom level
@@ -61,13 +64,12 @@ public class Minimap {
 
         // Determine which entity is the player
         for (int i = 0; i < entities.size; i++) {
-            MapEntity currentEntity = entites.items[i];
+            MapEntity currentEntity = entities.items[i];
             if (currentEntity.getEntityType() == EntityType.PLAYER) {
                 mapPlayer = currentEntity;
                 break;
             }
         }
-
 
         // Map has its own independent camera to allow zoom/different scale to game world
         camera = new OrthographicCamera();
@@ -81,6 +83,7 @@ public class Minimap {
         mapTexture = new Texture("map.png");
         playerIcon = new Texture("Player.png");
         gooseIcon = new Texture("Goose.png");
+        otherIcon = new Texture("GenericIcon.png");
 
     }
 
@@ -92,8 +95,8 @@ public class Minimap {
         }
 
         // Set and clamp camera position
-        effectiveViewportWidth = camera.viewportWidth * camera.zoom;
-        effectiveViewportHeight = camera.viewportHeight * camera.zoom;
+        float effectiveViewportWidth = camera.viewportWidth * camera.zoom;
+        float effectiveViewportHeight = camera.viewportHeight * camera.zoom;
 
         camera.position.set(
             MathUtils.clamp(position.x, effectiveViewportWidth/2f, worldSizeX - (effectiveViewportWidth/2f)),
@@ -105,14 +108,55 @@ public class Minimap {
     public void render(SpriteBatch batch) {
         // Configure viewport to render minimap in correct screen area
         viewport.update(sizeX, sizeY, false);
-        viewport.setScreenPosition(minimapPos.x, minimapPos.y);
+        viewport.setScreenPosition(minimapPosX, minimapPosY);
 
         // Switch batch over to minimap camera projection matrix
+        batch.setProjectionMatrix(camera.combined);
 
+        batch.begin();
+
+        // Draw the minimap background
+        batch.draw(mapTexture,
+            camera.position.x - worldSizeX * camera.zoom/2f,
+            camera.position.y - worldSizeY * camera.zoom/2f,
+            worldSizeX * camera.zoom,
+            worldSizeY * camera.zoom
+        );
+
+        // Draw entity markers on minimap, leave out player icon
+        for (int i = 0; i < entities.size; i++) {
+            MapEntity entity = entities.items[i];
+            Texture icon;
+
+            // Skip null entities, or entities not to be displayed on minimap
+            if (entity == null || !entity.isVisibleOnMap()) continue;
+
+            // Select between different entity types to determine which icon to use
+            switch (entity.getEntityType()) {
+                case GOOSE:
+                    icon = gooseIcon;
+                case PLAYER:
+                    continue; // Don't draw player yet
+                default:
+                    icon = otherIcon;
+            }
+
+            // Draw the entity icon
+            Vector2 entityPos = entity.getPosition();
+            batch.draw(icon, entityPos.x - 32, entityPos.y - 32); //TODO: scale/centre icons
+        }
+
+        // Draw player icon last so always on top of the minimap
+        Vector2 playerPos = mapPlayer.getPosition();
+        batch.draw(playerIcon, playerPos.x - 32, playerPos.y - 32); //TODO: scale/centre icon
+
+        batch.end();
     }
 
 
     public void setZoom(float zoom) {
         camera.zoom = zoom;
     }
+
+    //TODO: Implement methods to allow minimap to be resized with the rest of the window
 }
