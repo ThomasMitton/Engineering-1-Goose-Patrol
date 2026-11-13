@@ -2,6 +2,8 @@ package Goose_Patrol.york.ac.uk.minimap;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -12,40 +14,68 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * Shows the positions of entities passed.
  */
 public class Minimap {
-    // Textures
-    private Texture mapTexture;
-    private Texture playerIcon;
-    private Texture gooseIcon;
+    // Minimap textures
+    private final Texture mapTexture;
+    private final Texture playerIcon;
+    private final Texture gooseIcon;
+
 
     private Array<MapEntity> entities;
     private float zoom;
-    private Vector2 size;
-    private Vector2 worldSize;
+    private int sizeX;
+    private int sizeY;
+    private int minimapPosX;
+    private int minimapPosY;
+    private int worldSizeX;
+    private int worldSizeY;
 
+    private MapEntity mapPlayer; // Used to update the location of the player
 
     private final OrthographicCamera camera;
     private final Viewport viewport;
 
     /**
-     * Create a new minimap
+     * Create a new minimap.
+     * Shows all entities included in the given list. The map camera only tracks the first entity of EntityType.PLAYER
      * @param mapTexture Texture to be used to represent the main map (should be same size)
-     * @param entities List of MapEntities representing each entity to be rendered on the minimap
-     * @param size  Vector2 The size on screen of the minimap
-     * @param worldSize How much of the game world is shown by the map (i.e., pre-zoom)
+     * @param entities List of MapEntities representing each entity to be rendered on the minimap, should include player
+     * @param sizeX The width on screen of the minimap
+     * @param sizeY The height on screen of the minimap
+     * @param minimapPos The position of the bottom-left corner of the minimap
+     * @param worldSizeX The width of the game world
+     * @param worldSizeY The height of the game world
      * @param zoom Initial zoom level
      */
-    public Minimap(Texture mapTexture, Array<MapEntity> entities, Vector2 size, Vector2 worldSize, float zoom) {
+    public Minimap(Texture mapTexture, Array<MapEntity> entities, int sizeX, int sizeY,
+                   int minimapPosX, int minimapPosY, int worldSizeX, int worldSizeY, float zoom)
+    {
         this.mapTexture = mapTexture;
         this.entities = entities;
-        this.size = size;
+        this.sizeX = sizeX;
+        this.sizeY = sizeY;
+        this.minimapPosX = minimapPosX;
+        this.minimapPosY = minimapPosY;
         this.zoom = zoom;
-        this.worldSize = worldSize;
+        this.worldSizeX = worldSizeX;
+        this.worldSizeY = worldSizeY;
 
-        // Map has it's own independent camera to allow zoom/different scale to game world
+        // Determine which entity is the player
+        for (int i = 0; i < entities.size; i++) {
+            MapEntity currentEntity = entites.items[i];
+            if (currentEntity.getEntityType() == EntityType.PLAYER) {
+                mapPlayer = currentEntity;
+                break;
+            }
+        }
+
+
+        // Map has its own independent camera to allow zoom/different scale to game world
         camera = new OrthographicCamera();
+        camera.zoom = zoom;
 
-        // Use FitViewport to ensure minimap aspect ratio is fixed
-        viewport = new FitViewport(worldSize.x, worldSize.y, camera);
+        // Initialize minimap viewport with world size, FitViewport matches the aspect ratio of the world
+        // TODO: Use a different scaling method for the viewport?
+        viewport = new FitViewport(worldSizeX, worldSizeY, camera);
 
         // Set textures, should be readable at small scale
         mapTexture = new Texture("map.png");
@@ -55,15 +85,34 @@ public class Minimap {
     }
 
     public void update() {
-        //TODO: update camera position/entity positions on map
+        // Determine player position from list of entities passed
+        Vector2 position = Vector2.Zero;
+        if (mapPlayer != null) {
+            position = mapPlayer.getPosition();
+        }
+
+        // Set and clamp camera position
+        effectiveViewportWidth = camera.viewportWidth * camera.zoom;
+        effectiveViewportHeight = camera.viewportHeight * camera.zoom;
+
+        camera.position.set(
+            MathUtils.clamp(position.x, effectiveViewportWidth/2f, worldSizeX - (effectiveViewportWidth/2f)),
+            MathUtils.clamp(position.y, effectiveViewportHeight/2f, worldSizeY - (effectiveViewportHeight/2f)),
+            0
+        );
     }
 
-    public void render() {
-        //TODO
+    public void render(SpriteBatch batch) {
+        // Configure viewport to render minimap in correct screen area
+        viewport.update(sizeX, sizeY, false);
+        viewport.setScreenPosition(minimapPos.x, minimapPos.y);
+
+        // Switch batch over to minimap camera projection matrix
+
     }
 
 
-    public void setZoom() {
-        //TODO
+    public void setZoom(float zoom) {
+        camera.zoom = zoom;
     }
 }
