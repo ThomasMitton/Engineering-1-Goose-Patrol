@@ -1,6 +1,9 @@
 package Goose_Patrol.york.ac.uk;
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -8,6 +11,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import static com.badlogic.gdx.Gdx.app;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -17,7 +21,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
     private Player player;
-    private Goose goose;
+    private Array<Goose> gooseArray;
     private Texture map;
     private OrthographicCamera camera;
     private OrthographicCamera uiCamera;
@@ -26,22 +30,36 @@ public class Main extends ApplicationAdapter {
     private Timer timer;
     private String displayTime;
     private HealthBar health_bar;
+    public BreadPoints breadPoints;
+    public static BreadPoints staticBreadPoints;
+    private int pointCounter;
+    public Sound sound;
+    private GameOverScreen GameOverScreen;
+    private boolean gameOver = false;
+
     private ItemCounter ItemCounter;
+    private GameOver GameOver;
     private Stage inventory;
     private Texture inventoryImage;
     private Wall wall;
+    private float duckTimer;
+    private ResetGame resetGame;
+
 
     @Override
     public void create() {
+        GameOverScreen = new GameOverScreen(this);
         map = new Texture(Gdx.files.internal("map.png"));
+        gooseArray = new Array<>();
         batch = new SpriteBatch();
         player = new Player("Player.png", new Vector2(140, 210), 200f, map.getWidth(), map.getHeight());
-        goose = new Goose("Goose.png", new Vector2());
         wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
         font = new BitmapFont(Gdx.files.internal("Open Sans.fnt"));
         displayTime = Timer.refreshTimer();
+        pointCounter = BreadPoints.getCounter();
+        sound = Gdx.audio.newSound(Gdx.files.internal("beep.mp3"));
 
         uiCamera = new OrthographicCamera();
         uiCamera.setToOrtho(
@@ -53,8 +71,14 @@ public class Main extends ApplicationAdapter {
         map = new Texture(Gdx.files.internal("map.png"));
 
 
+
         health_bar = new HealthBar();
+        
         ItemCounter = new ItemCounter(batch);
+        GameOver = new GameOver(health_bar);
+        resetGame = new ResetGame();
+        
+        
 
         inventory = new Stage(new ScreenViewport());
         inventoryImage = new Texture(Gdx.files.internal("inventory.png"));
@@ -63,13 +87,26 @@ public class Main extends ApplicationAdapter {
         image1.setPosition(((float) Gdx.graphics.getWidth() / 2) - 64, 10);
         inventory.addActor(image1);
     }
-    //TODO: Handle logic in update() and rendering in render()
 
     @Override
     public void render() {
-        if (player.hitbox.overlaps(goose.hitbox)) {
-            app.log("Collision","You died!");
-            health_bar.health = health_bar.health - 1;
+        
+        
+        
+        for (Goose goose : gooseArray) {
+            if (player.hitbox.overlaps(goose.hitbox)) {
+                gooseArray.removeValue(goose, false);
+                health_bar.health = health_bar.health - 1;
+                if (health_bar.health <=0) {
+                    gameOver = true;
+                }
+            }
+        }
+        
+        
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){ // && goose is in range
+            BreadPoints.feedGoose();
         }
 
         if (player.hitbox.overlaps(wall.hitbox)) {
@@ -78,7 +115,17 @@ public class Main extends ApplicationAdapter {
         }
         ScreenUtils.clear(1f, 1f, 1f, 1f);
         player.update();
-        goose.update(player.getVector());
+        for (Goose goose : gooseArray) {
+            goose.update(player.getVector());
+        }
+
+        float delta = Gdx.graphics.getDeltaTime();
+        duckTimer += delta;
+        if (duckTimer >1f) {
+            duckTimer = 0;
+            addGoose();
+            app.log("Goose added","big if true");
+        }
 
         camera.position.set(
             MathUtils.clamp(MathUtils.clamp(
@@ -103,8 +150,11 @@ public class Main extends ApplicationAdapter {
 
         batch.draw(map, 0, 0, 2270, 1182);
         displayTime = Timer.refreshTimer();
+        pointCounter = BreadPoints.getCounter();
         player.render(batch);
-        goose.render(batch);
+        for (Goose goose : gooseArray) {
+            goose.render(batch);
+        }
         wall.render(batch);
 
         batch.end();
@@ -114,11 +164,21 @@ public class Main extends ApplicationAdapter {
 
         batch.begin();
 
+        displayTime = Timer.refreshTimer();
+        pointCounter = BreadPoints.getCounter();
+
         font.draw(
             batch,
             displayTime,
             Gdx.graphics.getWidth() - 200,
             Gdx.graphics.getHeight() - 50
+        );
+
+        font.draw(
+            batch,
+            (pointCounter+""),
+            Gdx.graphics.getWidth() - 200,
+            Gdx.graphics.getHeight() - 100
         );
 
         batch.end();
@@ -133,25 +193,51 @@ public class Main extends ApplicationAdapter {
         inventory.draw();
 
 
+
+       
+
         batch.end();
+        if(gameOver) {
+            GameOverScreen.display();
+        }
+
+        
+        
+        
     }
 
     @Override
     public void resize(int width, int height) {
         uiCamera.setToOrtho(false, width, height);
+        GameOverScreen.resize(width,height);
     }
+    
+    public void resetGame() {
+        resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, inventory, inventoryImage);
+        gameOver = false;
+         
+     }
 
     @Override
     public void dispose() {
         batch.dispose();
         player.dispose();
-        goose.dispose();
+        for (Goose goose : gooseArray) {
+            goose.dispose();
+        }
         map.dispose();
         wall.dispose();
         font.dispose();
         health_bar.dispose();
         ItemCounter.dispose();
+        sound.dispose();
+        ItemCounter.dispose();
         inventory.dispose();
         inventoryImage.dispose();
+        GameOverScreen.dispose();
+    }
+
+    private void addGoose() {
+        gooseArray.add(new Goose("Goose.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight())))));
     }
 }
