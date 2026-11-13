@@ -22,8 +22,12 @@ public class ItemCounter {
     
     public void display() {
         font.setColor(Color.BLACK);
-        font.getData().setScale(1);
+        font.getData().setScale(2);
         font.draw(batch,"Items used: " + itemsUsed, 20, 30);
+    }
+    
+    public void reset() {
+        itemsUsed = 0;
     }
     
     public void dispose() {

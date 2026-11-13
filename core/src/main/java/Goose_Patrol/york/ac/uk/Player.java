@@ -53,6 +53,10 @@ public class Player extends Entity implements MapEntity {
         }
     }
 
+    public void resetPos() {
+        pos.set(140,210);
+    }
+
     // --- MapEntity implementation ---
     public Vector2 getPosition() {
         return super.getVector();
