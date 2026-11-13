@@ -51,7 +51,5 @@ public class Player extends Entity {
         }
     }
     
-    public void resetPos() {
-        pos.set(140,210);
-    }
+  
 }

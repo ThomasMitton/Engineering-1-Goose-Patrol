@@ -71,3 +71,4 @@ font-title-export.png
 inventory.png
 libgdx.png
 map.png
+toaster.png
