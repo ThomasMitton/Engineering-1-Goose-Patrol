@@ -19,6 +19,13 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
+
+    //Used for swapping between the Main Menu and Game states.
+    public enum GameState {
+        MAIN_MENU,
+        GAME
+    }
+    private GameState currentState = GameState.MAIN_MENU;
     private SpriteBatch batch;
     private Player player;
     private Array<Goose> gooseArray;
@@ -93,6 +100,11 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void render() {
+
+        if(currentState == GameState.MAIN_MENU) {
+            renderMainMenu();
+            return;
+        }
         
         
         for (Goose goose : gooseArray) {
@@ -264,6 +276,23 @@ public class Main extends ApplicationAdapter {
         gooseArray.add(new Goose("Goose.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight())))));
     }
     
+
+    //Renders the Main Menu Screen (Work in progress).
+    private void renderMainMenu() {
+        com.badlogic.gdx.utils.ScreenUtils.clear(1f,1f,1f,1f);
+
+        uiCamera.update();
+        batch.setProjectionMatrix(uiCamera.combined);
+
+        batch.begin();
+        font.draw(batch, "GOOSE PATROL", 500,2*uiCamera.viewportHeight/3);
+        font.draw(batch, "Click anywhere or press space to play", 500, uiCamera.viewportHeight/2);
+        batch.end();
+
+        if(Gdx.input.isTouched() || Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE)) {
+            currentState = GameState.GAME;
+        }
+    }
     
     
 }
