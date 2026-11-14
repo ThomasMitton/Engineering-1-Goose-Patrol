@@ -27,14 +27,15 @@ public class Minimap {
     private int sizeY;
     private int minimapPosX;
     private int minimapPosY;
-    private int worldSizeX;
-    private int worldSizeY;
+    private int maxWorldX;
+    private int maxWorldY;
+    private int worldWindowX;
+    private int worldWindowY;
 
     private MapEntity mapPlayer; // Used to update the location of the player
 
     private final OrthographicCamera camera;
     private final Viewport viewport;
-    private float worldWidth;
 
     /**
      * Create a new minimap.
@@ -45,12 +46,15 @@ public class Minimap {
      * @param sizeY The height on screen of the minimap
      * @param minimapPosX The x-coordinate of the bottom-left corner of the minimap
      * @param minimapPosY The y-coordinate of the bottom-left corner of the minimap
-     * @param worldSizeX The width of the game world
-     * @param worldSizeY The height of the game world
+     * @param worldWindowX The horizontal 'slice' of the game world to feed the camera
+     * @param worldWindowY The vertical 'slice' of the game world to feed the camera
+     * @param maxWorldX The width of the game world to determine camera bounds
+     * @param maxWorldY The height of the game world to determine camera bounds
      * @param zoom Initial zoom level
      */
     public Minimap(Texture mapTexture, Array<MapEntity> entities, int sizeX, int sizeY,
-                   int minimapPosX, int minimapPosY, int worldSizeX, int worldSizeY, float zoom)
+                   int minimapPosX, int minimapPosY, int worldWindowX, int worldWindowY,
+                   int maxWorldX, int maxWorldY, float zoom)
     {
         this.mapTexture = mapTexture;
         this.entities = entities;
@@ -59,12 +63,14 @@ public class Minimap {
         this.minimapPosX = minimapPosX;
         this.minimapPosY = minimapPosY;
         this.zoom = zoom;
-        this.worldSizeX = worldSizeX;
-        this.worldSizeY = worldSizeY;
+        this.worldWindowX = worldWindowX;
+        this.worldWindowY = worldWindowY;
+        this.maxWorldX = maxWorldX;
+        this.maxWorldY = maxWorldY;
 
         // Determine which entity is the player
         for (int i = 0; i < entities.size; i++) {
-            MapEntity currentEntity = entities.items[i];
+            MapEntity currentEntity = entities.get(i);
             if (currentEntity.getEntityType() == EntityType.PLAYER) {
                 mapPlayer = currentEntity;
                 break;
@@ -77,10 +83,9 @@ public class Minimap {
 
         // Initialize minimap viewport with world size, FitViewport matches the aspect ratio of the world
         // TODO: Use a different scaling method for the viewport?
-        viewport = new FitViewport(worldSizeX, worldSizeY, camera);
+        viewport = new FitViewport(worldWindowX, worldWindowY, camera);
 
         // Set textures, should be readable at small scale
-        mapTexture = new Texture("map.png");
         playerIcon = new Texture("Player.png");
         gooseIcon = new Texture("Goose.png");
         otherIcon = new Texture("GenericIcon.png");
@@ -88,6 +93,11 @@ public class Minimap {
     }
 
     public void update() {
+
+        // Configure viewport to render minimap in correct screen area
+        viewport.update(sizeX, sizeY, true);
+        viewport.setScreenPosition(minimapPosX, minimapPosY);
+
         // Determine player position from list of entities passed
         Vector2 position = Vector2.Zero;
         if (mapPlayer != null) {
@@ -99,16 +109,15 @@ public class Minimap {
         float effectiveViewportHeight = camera.viewportHeight * camera.zoom;
 
         camera.position.set(
-            MathUtils.clamp(position.x, effectiveViewportWidth/2f, worldSizeX - (effectiveViewportWidth/2f)),
-            MathUtils.clamp(position.y, effectiveViewportHeight/2f, worldSizeY - (effectiveViewportHeight/2f)),
+            MathUtils.clamp(position.x, effectiveViewportWidth/2f, maxWorldX - (effectiveViewportWidth/2f)),
+            MathUtils.clamp(position.y, effectiveViewportHeight/2f, maxWorldY - (effectiveViewportHeight/2f)),
             0
         );
+        camera.update();
     }
 
     public void render(SpriteBatch batch) {
-        // Configure viewport to render minimap in correct screen area
-        viewport.update(sizeX, sizeY, false);
-        viewport.setScreenPosition(minimapPosX, minimapPosY);
+        viewport.apply();
 
         // Switch batch over to minimap camera projection matrix
         batch.setProjectionMatrix(camera.combined);
@@ -116,16 +125,11 @@ public class Minimap {
         batch.begin();
 
         // Draw the minimap background
-        batch.draw(mapTexture,
-            camera.position.x - worldSizeX * camera.zoom/2f,
-            camera.position.y - worldSizeY * camera.zoom/2f,
-            worldSizeX * camera.zoom,
-            worldSizeY * camera.zoom
-        );
+        batch.draw(mapTexture, 0, 0, maxWorldX, maxWorldY);
 
         // Draw entity markers on minimap, leave out player icon
         for (int i = 0; i < entities.size; i++) {
-            MapEntity entity = entities.items[i];
+            MapEntity entity = entities.get(i);
             Texture icon;
 
             // Skip null entities, or entities not to be displayed on minimap
@@ -135,6 +139,7 @@ public class Minimap {
             switch (entity.getEntityType()) {
                 case GOOSE:
                     icon = gooseIcon;
+                    break;
                 case PLAYER:
                     continue; // Don't draw player yet
                 default:
@@ -153,14 +158,21 @@ public class Minimap {
         batch.end();
     }
 
+    /**
+     * Replace the list of entities to be rendered on the minimap
+     * @param entities The new list of entities to render on the minimap
+     */
+    public void setEntities(Array<MapEntity> entities) {
+        this.entities = entities;
+    }
 
     public void setZoom(float zoom) {
         camera.zoom = zoom;
     }
 
-    //TODO: Implement methods to allow minimap to be resized with the rest of the window
-    public void resize(int screenWidth, int screenHeight) {
-
+    public void resize(int sizeX, int sizeY) {
+        this.sizeX = sizeX;
+        this.sizeY = sizeY;
     }
 
     public void dispose() { //TODO: check everything that should be disposed has been

@@ -1,4 +1,6 @@
 package Goose_Patrol.york.ac.uk;
+import Goose_Patrol.york.ac.uk.minimap.MapEntity;
+import Goose_Patrol.york.ac.uk.minimap.Minimap;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -15,7 +17,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import static com.badlogic.gdx.Gdx.app;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
@@ -25,6 +29,7 @@ public class Main extends ApplicationAdapter {
     private Texture map;
     private OrthographicCamera camera;
     private OrthographicCamera uiCamera;
+    private Viewport viewport;
     private BitmapFont font;
     private String myText;
     private Timer timer;
@@ -45,6 +50,9 @@ public class Main extends ApplicationAdapter {
     private float duckTimer;
     private ResetGame resetGame;
 
+    private Minimap minimap;
+    private Array<MapEntity> mapEntities;
+
 
     @Override
     public void create() {
@@ -56,6 +64,7 @@ public class Main extends ApplicationAdapter {
         wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
+        viewport = new FitViewport(map.getWidth(), map.getHeight(), camera);
         font = new BitmapFont(Gdx.files.internal("Open Sans.fnt"));
         displayTime = Timer.refreshTimer();
         pointCounter = BreadPoints.getCounter();
@@ -70,15 +79,27 @@ public class Main extends ApplicationAdapter {
 
         map = new Texture(Gdx.files.internal("map.png"));
 
+        // --- Create minimap ---
+        // Create list of MapEntity to pass to minimap
+        mapEntities = new Array<>();
+        mapEntities.add(player);
+        minimap = new Minimap(
+            map, mapEntities,
+            400, 300,
+            10, 10,
+            800, 450,
+            map.getWidth(), map.getHeight(),
+            1f
+        );
 
 
         health_bar = new HealthBar();
-        
+
         ItemCounter = new ItemCounter(batch);
         GameOver = new GameOver(health_bar);
         resetGame = new ResetGame();
-        
-        
+
+
 
         inventory = new Stage(new ScreenViewport());
         inventoryImage = new Texture(Gdx.files.internal("inventory.png"));
@@ -88,22 +109,22 @@ public class Main extends ApplicationAdapter {
         inventory.addActor(image1);
     }
 
+    //TODO: split update() and render() functions for clarity
     @Override
     public void render() {
-        
-        
-        
+
         for (Goose goose : gooseArray) {
             if (player.hitbox.overlaps(goose.hitbox)) {
                 gooseArray.removeValue(goose, false);
+                mapEntities.removeValue(goose, false);
                 health_bar.health = health_bar.health - 1;
                 if (health_bar.health <=0) {
                     gameOver = true;
                 }
             }
         }
-        
-        
+
+
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){ // && goose is in range
             BreadPoints.feedGoose();
@@ -148,6 +169,7 @@ public class Main extends ApplicationAdapter {
 
         batch.begin();
 
+
         batch.draw(map, 0, 0, 2270, 1182);
         displayTime = Timer.refreshTimer();
         pointCounter = BreadPoints.getCounter();
@@ -158,6 +180,7 @@ public class Main extends ApplicationAdapter {
         wall.render(batch);
 
         batch.end();
+
 
         uiCamera.update();
         batch.setProjectionMatrix(uiCamera.combined);
@@ -192,30 +215,31 @@ public class Main extends ApplicationAdapter {
         inventory.act();
         inventory.draw();
 
-
-
-       
-
         batch.end();
+
+        minimap.update();
+        minimap.render(batch);
+        viewport.apply();
+
         if(gameOver) {
             GameOverScreen.display();
         }
 
-        
-        
-        
+
     }
 
     @Override
     public void resize(int width, int height) {
         uiCamera.setToOrtho(false, width, height);
+        viewport.update(width, height, true);
         GameOverScreen.resize(width,height);
+        minimap.resize(width/5, height/5);
     }
-    
+
     public void resetGame() {
         resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, inventory, inventoryImage);
         gameOver = false;
-         
+
      }
 
     @Override
@@ -226,6 +250,7 @@ public class Main extends ApplicationAdapter {
             goose.dispose();
         }
         map.dispose();
+        minimap.dispose();
         wall.dispose();
         font.dispose();
         health_bar.dispose();
@@ -238,6 +263,8 @@ public class Main extends ApplicationAdapter {
     }
 
     private void addGoose() {
-        gooseArray.add(new Goose("Goose.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight())))));
+        Goose newGoose = new Goose("Goose.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight()))));
+        gooseArray.add(newGoose);
+        mapEntities.add(newGoose);
     }
 }
