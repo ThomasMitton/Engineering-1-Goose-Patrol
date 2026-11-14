@@ -56,7 +56,7 @@ public class Main extends ApplicationAdapter {
         batch = new SpriteBatch();
         player = new Player("Player.png", new Vector2(140, 210), 200f, map.getWidth(), map.getHeight());
         wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
-    
+
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
         font = new BitmapFont(Gdx.files.internal("Open Sans.fnt"));
@@ -76,12 +76,12 @@ public class Main extends ApplicationAdapter {
 
 
         health_bar = new HealthBar();
-        
+
         ItemCounter = new ItemCounter(batch);
         GameOver = new GameOver(health_bar);
         resetGame = new ResetGame();
-        
-        
+
+
 
         inventory = new Stage(new ScreenViewport());
         inventoryImage = new Texture(Gdx.files.internal("inventory.png"));
@@ -93,8 +93,8 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void render() {
-        
-        
+
+
         for (Goose goose : gooseArray) {
             if (player.hitbox.overlaps(goose.hitbox)) {
                 gooseArray.removeValue(goose, false);
@@ -104,25 +104,31 @@ public class Main extends ApplicationAdapter {
                 }
             }
         }
-        
+
         if (toaster != null && player.hitbox.overlaps(toaster.hitbox)) {
             toaster.dispose();
             toaster=null;
             app.log("Collision", "TOASTER");
             //actiave minigame
         }
-        
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){ // && goose is in range
-            BreadPoints.feedGoose();
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){
+            for (Goose goose : gooseArray) {
+                boolean destroy = goose.beFed(player.getPos(), BreadPoints.getCounter());
+                if (destroy) {
+                    gooseArray.removeValue(goose, false);
+                    app.log("Collision", "Target Neutralised");
+                }
+            }
         }
 
         if (player.hitbox.overlaps(wall.hitbox)) {
             app.log("Collision", "WALL");
             wall.checkCollisions(player.pos);
         }
-        
-       
+
+
         ScreenUtils.clear(1f, 1f, 1f, 1f);
         player.update();
         for (Goose goose : gooseArray) {
@@ -165,12 +171,12 @@ public class Main extends ApplicationAdapter {
         for (Goose goose : gooseArray) {
             goose.render(batch);
         }
-        
+
         if (toaster != null) {
             toaster.render(batch);
         }
         wall.render(batch);
-      
+
 
         batch.end();
 
@@ -209,16 +215,16 @@ public class Main extends ApplicationAdapter {
 
 
 
-       
+
 
         batch.end();
         if(gameOver) {
             GameOverScreen.display();
         }
 
-        
-        
-        
+
+
+
     }
 
     @Override
@@ -226,16 +232,16 @@ public class Main extends ApplicationAdapter {
         uiCamera.setToOrtho(false, width, height);
         GameOverScreen.resize(width,height);
     }
-    
+
     public void resetGame() {
         resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, inventory, inventoryImage);
-        
+
         if (toaster != null) {
             toaster.dispose();
         }
         toaster = new Toaster("toaster.png", new Vector2(900,300), 39,31);
         gameOver = false;
-         
+
      }
 
     @Override
@@ -263,7 +269,7 @@ public class Main extends ApplicationAdapter {
     private void addGoose() {
         gooseArray.add(new Goose("Goose.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight())))));
     }
-    
-    
-    
+
+
+
 }

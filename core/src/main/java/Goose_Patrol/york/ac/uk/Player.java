@@ -50,6 +50,10 @@ public class Player extends Entity {
             }
         }
     }
-    
-  
+
+    public Vector2 getPos(){
+        return super.pos;
+    }
+
+
 }
