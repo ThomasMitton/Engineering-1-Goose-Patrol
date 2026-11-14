@@ -87,7 +87,7 @@ public class Minimap {
 
         // Set textures, should be readable at small scale
         playerIcon = new Texture("Player.png");
-        gooseIcon = new Texture("Goose.png");
+        gooseIcon = new Texture("GenericIcon.png");
         otherIcon = new Texture("GenericIcon.png");
 
     }
@@ -148,12 +148,17 @@ public class Minimap {
 
             // Draw the entity icon
             Vector2 entityPos = entity.getPosition();
-            batch.draw(icon, entityPos.x - 32, entityPos.y - 32); //TODO: scale/centre icons
+            batch.draw(
+                icon, entityPos.x - icon.getWidth()/2f,
+                entityPos.y - icon.getHeight()/2f
+            );
         }
 
         // Draw player icon last so always on top of the minimap
         Vector2 playerPos = mapPlayer.getPosition();
-        batch.draw(playerIcon, playerPos.x - 32, playerPos.y - 32); //TODO: scale/centre icon
+        batch.draw(playerIcon, playerPos.x - playerIcon.getWidth()/2f,
+            playerPos.y - playerIcon.getHeight()/2f
+        );
 
         batch.end();
     }
@@ -173,6 +178,11 @@ public class Minimap {
     public void resize(int sizeX, int sizeY) {
         this.sizeX = sizeX;
         this.sizeY = sizeY;
+    }
+
+    public void setPos(int posX, int posY) {
+        this.minimapPosX = posX;
+        this.minimapPosY = posY;
     }
 
     public void dispose() { //TODO: check everything that should be disposed has been

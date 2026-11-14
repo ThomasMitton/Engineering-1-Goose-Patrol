@@ -63,8 +63,7 @@ public class Main extends ApplicationAdapter {
         player = new Player("Player.png", new Vector2(140, 210), 200f, map.getWidth(), map.getHeight());
         wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 600);
-        viewport = new FitViewport(map.getWidth(), map.getHeight(), camera);
+        viewport = new FitViewport(800, 450, camera);
         font = new BitmapFont(Gdx.files.internal("Open Sans.fnt"));
         displayTime = Timer.refreshTimer();
         pointCounter = BreadPoints.getCounter();
@@ -83,11 +82,18 @@ public class Main extends ApplicationAdapter {
         // Create list of MapEntity to pass to minimap
         mapEntities = new Array<>();
         mapEntities.add(player);
+
+        // Calculate position values
+        int minimapWidth = 400;
+        int minimapHeight = 400;
+        int margin = 10;
+        int minimapPosX = Gdx.graphics.getWidth() - minimapWidth - margin;
+
         minimap = new Minimap(
             map, mapEntities,
-            400, 300,
-            10, 10,
-            800, 450,
+            minimapWidth, minimapHeight,
+            minimapPosX, margin,
+            800, 800,
             map.getWidth(), map.getHeight(),
             1f
         );
@@ -233,11 +239,19 @@ public class Main extends ApplicationAdapter {
         uiCamera.setToOrtho(false, width, height);
         viewport.update(width, height, true);
         GameOverScreen.resize(width,height);
-        minimap.resize(width/5, height/5);
+
+        // --- Handle minimap resize ---
+        // Calculate position values
+        int minimapWidth = width/5;
+        int minimapHeight = minimapWidth; // Guarantees square shape, change wanting to mirror window aspect ratio
+        int margin = 10;
+        int minimapPosX = width - minimapWidth - margin;
+        minimap.resize(minimapWidth, minimapHeight);
+        minimap.setPos(minimapPosX, margin);
     }
 
     public void resetGame() {
-        resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, inventory, inventoryImage);
+        resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, inventory, inventoryImage, mapEntities);
         gameOver = false;
 
      }
