@@ -9,9 +9,9 @@ import com.badlogic.gdx.math.Vector2;
  * Entity superclass for player, goose, and items
  */
 public class Entity {
-    protected Texture texture;
-    protected Vector2 pos;
-    protected Rectangle hitbox;
+    public Texture texture;
+    public Vector2 pos;
+    public Rectangle hitbox;
 
     protected Entity(String texture, Vector2 pos) {
         this.texture = new Texture(texture);

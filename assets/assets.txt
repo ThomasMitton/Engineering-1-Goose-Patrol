@@ -72,4 +72,5 @@ font-title-export.png
 inventory.png
 libgdx.png
 map.png
+start_menu.png
 toaster.png

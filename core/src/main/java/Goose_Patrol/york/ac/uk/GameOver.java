@@ -2,6 +2,7 @@ package Goose_Patrol.york.ac.uk;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ScreenUtils;
+import screens.GameOverScreen;
 
 public class GameOver {
    public boolean GameOver = false;
@@ -13,7 +14,7 @@ public class GameOver {
    public GameOver (HealthBar health_bar) {
        this.health_bar = health_bar;
    }
-   
+
    public static boolean Time_zero() {
        return System.currentTimeMillis() - Timer.startTime >= 300000;
    }
@@ -29,7 +30,7 @@ public class GameOver {
             ScreenUtils.clear(Color.BLACK);
 
         }
-        
+
 
    }
 

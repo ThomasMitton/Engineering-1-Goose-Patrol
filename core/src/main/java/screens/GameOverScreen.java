@@ -1,5 +1,7 @@
-package Goose_Patrol.york.ac.uk;
+package screens;
+import Goose_Patrol.york.ac.uk.ResetGame;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -11,25 +13,25 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
 
-public class GameOverScreen {
+public class GameOverScreen implements Screen {
 
     private Stage stage;
     private Skin skin;
     private OrthographicCamera uiCamera;
     public ResetGame resetGame;
-    private Main game;
-    
-    
-    
+    private GameScreen game;
 
-    public GameOverScreen(Main game) {
+
+
+
+    public GameOverScreen(GameScreen game) {
         this.game = game;
         //stage setup
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
         //importing skins for buttons ect
         skin = new Skin(Gdx.files.internal("flat-earth-ui.json"));
-        
+
         //creating table for button to be shown on screen
         Table GameOver_button = new Table();
         GameOver_button.setFillParent(true);
@@ -48,7 +50,7 @@ public class GameOverScreen {
 
         // quit button
         TextButton exitButton = new TextButton("Quit", skin);
-        
+
         //clicking logic for quit button
         exitButton.addListener(new ClickListener() {
             @Override
@@ -73,8 +75,33 @@ public class GameOverScreen {
         stage.draw();
     }
 
+    @Override
+    public void show() {
+
+    }
+
+    @Override
+    public void render(float delta) {
+
+    }
+
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+
     }
 
     public void dispose() {

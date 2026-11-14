@@ -1,12 +1,11 @@
-package Goose_Patrol.york.ac.uk;
+package screens;
 
-import com.badlogic.gdx.ApplicationAdapter;
+import Goose_Patrol.york.ac.uk.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -15,10 +14,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
 import static com.badlogic.gdx.Gdx.app;
 
-public class Main extends ApplicationAdapter {
-    private SpriteBatch batch;
+public class GameScreen extends GeneralScreen {
+    private GoosePatrol game;
     private Player player;
     private Array<Goose> gooseArray;
     private Texture map;
@@ -44,14 +44,14 @@ public class Main extends ApplicationAdapter {
     private ResetGame resetGame;
     private Toaster toaster;
 
+    public GameScreen(GoosePatrol game) {
+        super(game);
+        this.game = game;
 
-    @Override
-    public void create() {
         GameOverScreen = new GameOverScreen(this);
         map = new Texture(Gdx.files.internal("map.png"));
         gooseArray = new Array<>();
         toaster = new Toaster("toaster.png", new Vector2(900,300),39, 31);
-        batch = new SpriteBatch();
         player = new Player("Player.png", new Vector2(140, 210), 200f, map.getWidth(), map.getHeight());
         wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
 
@@ -73,7 +73,7 @@ public class Main extends ApplicationAdapter {
 
         healthBar = new HealthBar();
 
-        ItemCounter = new ItemCounter(batch);
+        ItemCounter = new ItemCounter(game.batch);
         GameOver = new GameOver(healthBar);
         resetGame = new ResetGame();
 
@@ -88,7 +88,7 @@ public class Main extends ApplicationAdapter {
     }
 
     @Override
-    public void render() {
+    public void render(float delta) {
         logic();
         draw();
     }
@@ -155,38 +155,38 @@ public class Main extends ApplicationAdapter {
 
         camera.update();
 
-        batch.setProjectionMatrix(camera.combined);
+        game.batch.setProjectionMatrix(camera.combined);
 
-        batch.begin();
+        game.batch.begin();
 
-        batch.draw(map, 0, 0, 2270, 1182);
+        game.batch.draw(map, 0, 0, 2270, 1182);
         displayTime = Timer.refreshTimer();
         pointCounter = BreadPoints.getCounter();
-        player.render(batch);
+        player.render(game.batch);
         for (Goose goose : gooseArray) {
-            goose.render(batch);
+            goose.render(game.batch);
         }
 
         if (toaster != null) {
-            toaster.render(batch);
+            toaster.render(game.batch);
         }
-        wall.render(batch);
+        wall.render(game.batch);
 
         uiCamera.update();
-        batch.setProjectionMatrix(uiCamera.combined);
+        game.batch.setProjectionMatrix(uiCamera.combined);
 
         displayTime = Timer.refreshTimer();
         pointCounter = BreadPoints.getCounter();
 
         font.draw(
-            batch,
+            game.batch,
             displayTime,
             Gdx.graphics.getWidth() - 200,
             Gdx.graphics.getHeight() - 50
         );
 
         font.draw(
-            batch,
+            game.batch,
             (pointCounter+""),
             Gdx.graphics.getWidth() - 200,
             Gdx.graphics.getHeight() - 100
@@ -199,7 +199,7 @@ public class Main extends ApplicationAdapter {
         inventory.act();
         inventory.draw();
 
-        batch.end();
+        game.batch.end();
         if(gameOver) {
             GameOverScreen.display();
         }
@@ -224,7 +224,7 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void dispose() {
-        batch.dispose();
+        game.batch.dispose();
         player.dispose();
         for (Goose goose : gooseArray) {
             goose.dispose();
