@@ -31,8 +31,8 @@ public class Goose extends Entity implements MapEntity {
     }
 
     // --- MapEntity implementation ---
-    public Vector2 getPosition() {
-        return super.getVector();
+    public Vector2 getPos() {
+        return super.getPos();
     }
 
     public EntityType getEntityType() {

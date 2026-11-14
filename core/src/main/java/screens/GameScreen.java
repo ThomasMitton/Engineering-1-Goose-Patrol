@@ -96,7 +96,7 @@ public class GameScreen extends GeneralScreen {
         player.update(); // Updates player hitbox and takes inputs
 
         for (Goose goose : gooseArray) { // Cycles through all geese
-            goose.update(player.getVector()); // Goose movement logic
+            goose.update(player.getPos()); // Goose movement logic
 
             if (player.hitbox.overlaps(goose.hitbox)) { // Checks if goose collides with player
                 goose.dispose();
@@ -151,14 +151,14 @@ public class GameScreen extends GeneralScreen {
         camera.position.set(
             MathUtils.clamp(MathUtils.clamp(
                 camera.position.x,
-                player.getVector().x - (camera.viewportWidth / 3) + player.texture.getWidth(),
-                player.getVector().x + (camera.viewportWidth / 3)
+                player.getPos().x - (camera.viewportWidth / 3) + player.texture.getWidth(),
+                player.getPos().x + (camera.viewportWidth / 3)
             ), camera.viewportWidth / 2, map.getWidth() - camera.viewportWidth / 2),
 
             MathUtils.clamp(MathUtils.clamp(
                 camera.position.y,
-                player.getVector().y - (camera.viewportHeight / 3) + player.texture.getHeight(),
-                player.getVector().y + (camera.viewportHeight / 3)
+                player.getPos().y - (camera.viewportHeight / 3) + player.texture.getHeight(),
+                player.getPos().y + (camera.viewportHeight / 3)
             ), camera.viewportHeight / 2, map.getHeight() - camera.viewportHeight / 2),
             0
         );

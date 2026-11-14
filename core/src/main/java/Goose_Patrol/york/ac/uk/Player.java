@@ -58,9 +58,6 @@ public class Player extends Entity implements MapEntity {
     }
 
     // --- MapEntity implementation ---
-    public Vector2 getPosition() {
-        return super.getVector();
-    }
      public EntityType getEntityType() {
         return EntityType.PLAYER;
     }

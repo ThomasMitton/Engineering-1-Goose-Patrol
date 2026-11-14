@@ -19,7 +19,7 @@ public class Entity {
         this.hitbox = new Rectangle();
     }
 
-    public Vector2 getVector() {
+    public Vector2 getPos() {
         return pos;
     }
 
