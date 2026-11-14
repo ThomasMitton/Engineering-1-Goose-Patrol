@@ -43,4 +43,24 @@ public class Goose extends Entity implements MapEntity {
         //TODO: visible on map only if within certain radius of player?
         return true;
     }
+
+    public boolean beFed(Vector2 playerPos,int  pointValue){
+        float playerX = playerPos.x;
+        float playerY = playerPos.y;
+
+        float gooseX = pos.x;
+        float gooseY = pos.y;
+
+        System.out.println("playerX: " + playerX + " playerY: " + playerY);
+        System.out.println("gooseX: " + gooseX  + " gooseY: " + gooseY);
+
+        if ((gooseX - playerX < 100 && gooseY - playerY < 100) && (gooseX - playerX > -110 && gooseY - playerY > -100)){
+            if (pointValue > 0) {
+                BreadPoints.decrementPoints();
+                this.dispose();
+                return true;
+            }
+        }
+        return false;
+    }
 }

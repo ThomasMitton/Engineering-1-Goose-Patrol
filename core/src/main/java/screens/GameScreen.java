@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
 import static com.badlogic.gdx.Gdx.app;
 
 public class GameScreen extends GeneralScreen {
@@ -25,18 +24,18 @@ public class GameScreen extends GeneralScreen {
     private OrthographicCamera camera;
     private OrthographicCamera uiCamera;
     private BitmapFont font;
-    private String myText; // What do
-    private Timer timer; // What do
+    private String myText;
+    private Timer timer;
     private String displayTime;
     private HealthBar healthBar;
     public BreadPoints breadPoints;
-    public static BreadPoints staticBreadPoints; // What do
+    public static BreadPoints staticBreadPoints;
     private int pointCounter;
     public Sound sound;
     private GameOverScreen GameOverScreen;
     private boolean gameOver = false;
     private ItemCounter ItemCounter;
-    private GameOver GameOver; // ???
+    private GameOver GameOver;
     private Stage inventory;
     private Texture inventoryImage;
     private Wall wall;
@@ -114,7 +113,18 @@ public class GameScreen extends GeneralScreen {
             toaster.dispose();
             toaster = null;
             app.log("Collision", "TOASTER");
-            //TODO: Toaster minigame
+            //actiave minigame
+        }
+
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){
+            for (Goose goose : gooseArray) {
+                boolean destroy = goose.beFed(player.getPos(), BreadPoints.getCounter());
+                if (destroy) {
+                    gooseArray.removeValue(goose, false);
+                    app.log("Collision", "Target Neutralised");
+                }
+            }
         }
 
         if (player.hitbox.overlaps(wall.hitbox)) {
@@ -247,7 +257,4 @@ public class GameScreen extends GeneralScreen {
     private void addGoose() {
         gooseArray.add(new Goose("Goose.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight())))));
     }
-
-
-
 }
