@@ -1,5 +1,6 @@
 ## Gradle:
 .gradle/
+.misc.xml
 gradle-app.setting
 /build/
 /android/build/
