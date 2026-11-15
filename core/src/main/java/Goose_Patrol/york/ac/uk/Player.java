@@ -53,11 +53,6 @@ public class Player extends Entity implements MapEntity {
         }
     }
 
-    public Vector2 getPos(){
-        return super.pos;
-    }
-
-
     // --- MapEntity implementation ---
     public Vector2 getPosition() {
         return super.getVector();
