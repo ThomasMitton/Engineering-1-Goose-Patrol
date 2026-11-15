@@ -6,8 +6,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.Gdx;
 
 /**
  * A minimap representing the main map with the passed texture.
@@ -18,6 +19,7 @@ public class Minimap {
     private final Texture mapTexture;
     private final Texture playerIcon;
     private final Texture gooseIcon;
+    private final Texture itemIcon;
     private final Texture otherIcon;
 
 
@@ -29,13 +31,13 @@ public class Minimap {
     private int minimapPosY;
     private int maxWorldX;
     private int maxWorldY;
-    private int worldWindowX;
-    private int worldWindowY;
 
     private MapEntity mapPlayer; // Used to update the location of the player
 
     private final OrthographicCamera camera;
     private final Viewport viewport;
+
+    private boolean visible;
 
     /**
      * Create a new minimap.
@@ -46,16 +48,14 @@ public class Minimap {
      * @param sizeY The height on screen of the minimap
      * @param minimapPosX The x-coordinate of the bottom-left corner of the minimap
      * @param minimapPosY The y-coordinate of the bottom-left corner of the minimap
-     * @param worldWindowX The horizontal 'slice' of the game world to feed the camera
-     * @param worldWindowY The vertical 'slice' of the game world to feed the camera
      * @param maxWorldX The width of the game world to determine camera bounds
      * @param maxWorldY The height of the game world to determine camera bounds
      * @param zoom Initial zoom level
      */
     public Minimap(Texture mapTexture, Array<MapEntity> entities, int sizeX, int sizeY,
-                   int minimapPosX, int minimapPosY, int worldWindowX, int worldWindowY,
-                   int maxWorldX, int maxWorldY, float zoom)
-    {
+                   int minimapPosX, int minimapPosY,
+                   int maxWorldX, int maxWorldY, float zoom, boolean visible) {
+
         this.mapTexture = mapTexture;
         this.entities = entities;
         this.sizeX = sizeX;
@@ -63,10 +63,10 @@ public class Minimap {
         this.minimapPosX = minimapPosX;
         this.minimapPosY = minimapPosY;
         this.zoom = zoom;
-        this.worldWindowX = worldWindowX;
-        this.worldWindowY = worldWindowY;
         this.maxWorldX = maxWorldX;
         this.maxWorldY = maxWorldY;
+
+        this.visible = visible;
 
         // Determine which entity is the player
         for (int i = 0; i < entities.size; i++) {
@@ -82,21 +82,22 @@ public class Minimap {
         camera.zoom = zoom;
 
         // Initialize minimap viewport with world size, FitViewport matches the aspect ratio of the world
-        // TODO: Use a different scaling method for the viewport?
-        viewport = new FitViewport(worldWindowX, worldWindowY, camera);
+        viewport = new FillViewport(sizeX, sizeY, camera);
 
         // Set textures, should be readable at small scale
-        playerIcon = new Texture("Player.png");
-        gooseIcon = new Texture("GenericIcon.png");
+        playerIcon = new Texture(Gdx.files.internal("minimap_icon.png"));
+        gooseIcon = new Texture("EnemyIcon.png");
+        itemIcon = new Texture("ItemIcon.png");
         otherIcon = new Texture("GenericIcon.png");
 
     }
 
     public void update() {
-
+        if (!visible) { return; }
         // Configure viewport to render minimap in correct screen area
         viewport.update(sizeX, sizeY, true);
         viewport.setScreenPosition(minimapPosX, minimapPosY);
+
 
         // Determine player position from list of entities passed
         Vector2 position = Vector2.Zero;
@@ -117,6 +118,7 @@ public class Minimap {
     }
 
     public void render(SpriteBatch batch) {
+        if (!visible) { return;}
         viewport.apply();
 
         // Switch batch over to minimap camera projection matrix
@@ -139,6 +141,9 @@ public class Minimap {
             switch (entity.getEntityType()) {
                 case GOOSE:
                     icon = gooseIcon;
+                    break;
+                case BREAD_ITEM:
+                    icon = itemIcon;
                     break;
                 case PLAYER:
                     continue; // Don't draw player yet
@@ -175,6 +180,18 @@ public class Minimap {
         camera.zoom = zoom;
     }
 
+    public void show() {
+        visible = true;
+    }
+
+    public void hide() {
+        visible = false;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
     public void resize(int sizeX, int sizeY) {
         this.sizeX = sizeX;
         this.sizeY = sizeY;
@@ -184,6 +201,7 @@ public class Minimap {
         this.minimapPosX = posX;
         this.minimapPosY = posY;
     }
+
 
     public void dispose() { //TODO: check everything that should be disposed has been
         mapTexture.dispose();

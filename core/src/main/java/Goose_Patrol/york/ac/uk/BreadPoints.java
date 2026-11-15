@@ -7,7 +7,7 @@ import com.badlogic.gdx.audio.Sound;
 
 public class BreadPoints {
     private static final Sound sound = Gdx.audio.newSound(Gdx.files.internal("beep.mp3"));
-    private static int counter = 20;
+    private static int counter = 10;
 
     public static void incrementPoints(){
         counter++;

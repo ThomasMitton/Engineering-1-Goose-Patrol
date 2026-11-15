@@ -17,6 +17,10 @@ public class BreadItem extends Entity implements MapEntity {
         this.dispose();
     }
 
+    public Vector2 getPosition() {
+        return new Vector2(pos.x, pos.y);
+    }
+
     @Override
     public boolean isVisibleOnMap() {
         return true;
