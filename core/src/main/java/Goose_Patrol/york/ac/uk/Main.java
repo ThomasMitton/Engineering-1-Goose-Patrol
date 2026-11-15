@@ -165,6 +165,8 @@ public class Main extends ApplicationAdapter {
         if (toaster != null && player.hitbox.overlaps(toaster.hitbox)) {
             toastGameActive = true;
 
+            ItemCounter.EventsActivated++;
+
             toaster.dispose();
             toaster=null;
 
