@@ -46,7 +46,7 @@ public class Main extends ApplicationAdapter {
     public Sound sound;
     private GameOverScreen GameOverScreen;
     private boolean gameOver = false;
-
+    private Texture titleScreen;
     private ItemCounter ItemCounter;
     private GameOver GameOver;
     private Inventory Inventory;
@@ -81,7 +81,7 @@ public class Main extends ApplicationAdapter {
         shapeRenderer = new ShapeRenderer();
         player = new Player("Player.png", new Vector2(140, 210), 200f, map.getWidth(), map.getHeight());
         wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
-
+        titleScreen = new Texture("TitleScreen.png");
         camera = new OrthographicCamera();
         viewport = new ExtendViewport(800, 450, camera);
         font = new BitmapFont(Gdx.files.internal("Open Sans.fnt"));
@@ -502,12 +502,10 @@ public class Main extends ApplicationAdapter {
     private void renderMainMenu() {
         com.badlogic.gdx.utils.ScreenUtils.clear(1f,1f,1f,1f);
 
-        uiCamera.update();
-        batch.setProjectionMatrix(uiCamera.combined);
-
+        viewport.apply();
+        batch.setProjectionMatrix(viewport.getCamera().combined);
         batch.begin();
-        font.draw(batch, "GOOSE PATROL", 500,2*uiCamera.viewportHeight/3);
-        font.draw(batch, "Click anywhere or press space to play", 500, uiCamera.viewportHeight/2);
+        batch.draw(titleScreen,0,0,viewport.getWorldWidth(),viewport.getWorldHeight());
         batch.end();
 
         if(Gdx.input.isTouched() || Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE)) {
