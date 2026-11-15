@@ -37,6 +37,8 @@ public class Minimap {
     private final OrthographicCamera camera;
     private final Viewport viewport;
 
+    private boolean visible;
+
     /**
      * Create a new minimap.
      * Shows all entities included in the given list. The map camera only tracks the first entity of EntityType.PLAYER
@@ -54,7 +56,7 @@ public class Minimap {
      */
     public Minimap(Texture mapTexture, Array<MapEntity> entities, int sizeX, int sizeY,
                    int minimapPosX, int minimapPosY, int worldWindowX, int worldWindowY,
-                   int maxWorldX, int maxWorldY, float zoom)
+                   int maxWorldX, int maxWorldY, float zoom, boolean visible)
     {
         this.mapTexture = mapTexture;
         this.entities = entities;
@@ -67,6 +69,8 @@ public class Minimap {
         this.worldWindowY = worldWindowY;
         this.maxWorldX = maxWorldX;
         this.maxWorldY = maxWorldY;
+
+        this.visible = visible;
 
         // Determine which entity is the player
         for (int i = 0; i < entities.size; i++) {
@@ -82,7 +86,6 @@ public class Minimap {
         camera.zoom = zoom;
 
         // Initialize minimap viewport with world size, FitViewport matches the aspect ratio of the world
-        // TODO: Use a different scaling method for the viewport?
         viewport = new FitViewport(worldWindowX, worldWindowY, camera);
 
         // Set textures, should be readable at small scale
@@ -93,7 +96,7 @@ public class Minimap {
     }
 
     public void update() {
-
+        if (!visible) { return; }
         // Configure viewport to render minimap in correct screen area
         viewport.update(sizeX, sizeY, true);
         viewport.setScreenPosition(minimapPosX, minimapPosY);
@@ -117,6 +120,7 @@ public class Minimap {
     }
 
     public void render(SpriteBatch batch) {
+        if (!visible) { return;}
         viewport.apply();
 
         // Switch batch over to minimap camera projection matrix
@@ -173,6 +177,18 @@ public class Minimap {
 
     public void setZoom(float zoom) {
         camera.zoom = zoom;
+    }
+
+    public void show() {
+        visible = true;
+    }
+
+    public void hide() {
+        visible = false;
+    }
+
+    public boolean isVisible() {
+        return visible;
     }
 
     public void resize(int sizeX, int sizeY) {

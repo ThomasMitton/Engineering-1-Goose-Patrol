@@ -67,7 +67,10 @@ public class Main extends ApplicationAdapter {
     private Stage stage;
 
     private Minimap minimap;
+    private Minimap fullscreenMap;
     private Array<MapEntity> mapEntities;
+    private boolean mapUnlocked;
+    private boolean mapOpened;
 
 
     @Override
@@ -103,6 +106,7 @@ public class Main extends ApplicationAdapter {
 
 
         // --- Create minimap ---
+        mapUnlocked = true;
         // Create list of MapEntity to pass to minimap
         mapEntities = new Array<>();
         mapEntities.add(player);
@@ -119,8 +123,28 @@ public class Main extends ApplicationAdapter {
             minimapPosX, margin,
             800, 800,
             map.getWidth(), map.getHeight(),
-            1f
+            1f, false
         );
+
+
+        // --- Create full screen map ---
+        mapOpened = false;
+        margin = 50;
+        int fullscreenMapWidth = Gdx.graphics.getWidth() - (margin * 2);
+        int fullscreenMapHeight = Gdx.graphics.getHeight() - (margin * 2);
+        // Center map if texture smaller than window
+        int fMapPosX = (Gdx.graphics.getWidth()/2) -  (fullscreenMapWidth/2);
+        int fMapPosY = (Gdx.graphics.getHeight()/2) -  (fullscreenMapHeight/2);
+
+        fullscreenMap = new Minimap(
+            map, mapEntities,
+            fullscreenMapWidth, fullscreenMapHeight,
+            fMapPosX, fMapPosY,
+            map.getWidth(), map.getHeight(),
+            map.getWidth(), map.getHeight(),
+            1f, false
+        );
+
 
 
         health_bar = new HealthBar();
@@ -138,7 +162,7 @@ public class Main extends ApplicationAdapter {
     //TODO: split update() and render() functions for clarity
     @Override
     public void render() {
-
+        viewport.apply();
 
         if(currentState == GameState.MAIN_MENU) {
             renderMainMenu();
@@ -413,9 +437,37 @@ public class Main extends ApplicationAdapter {
 
         batch.end();
 
+        // --- Map logic/rendering ---
+        // Check if map opened
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)
+                || Gdx.input.isKeyJustPressed(Input.Keys.M)) {
+            mapOpened = !mapOpened;
+        }
+
+        // Draw minimap/map depending on whether unlocked
+        if (mapUnlocked) {
+            if (mapOpened) {
+                // Show fullscreen map
+                fullscreenMap.show();
+                minimap.hide();
+
+            } else {
+                // Show minimap
+                minimap.show();
+                fullscreenMap.hide();
+            }
+        }
+
+        // Show minimap (if hidden, does nothing)
         minimap.update();
         minimap.render(batch);
-        viewport.apply();
+
+        // Show fullscreen map (if hidden, does nothing)
+        fullscreenMap.update();
+        fullscreenMap.render(batch);
+        viewport.apply(); // reset viewport to game viewport
+
+
 
         Inventory.draw();
 
@@ -435,12 +487,22 @@ public class Main extends ApplicationAdapter {
 
         // --- Handle minimap resize ---
         // Calculate position values
-        int minimapWidth = width/5;
+        int minimapWidth = width/6;
         int minimapHeight = minimapWidth; // Guarantees square shape, change wanting to mirror window aspect ratio
         int margin = 10;
         int minimapPosX = width - minimapWidth - margin;
         minimap.resize(minimapWidth, minimapHeight);
         minimap.setPos(minimapPosX, margin);
+
+        // --- Handle full screen map resize ---
+        margin = 50;
+        int fullscreenMapWidth = width - (margin * 2);
+        int fullscreenMapHeight = height - (margin * 2);
+        // Center map
+        int fMapPosX = (width/2) -  (fullscreenMapWidth/2);
+        int fMapPosY = (height/2) -  (fullscreenMapHeight/2);
+        fullscreenMap.resize(fullscreenMapWidth, fullscreenMapHeight);
+        fullscreenMap.setPos(fMapPosX, fMapPosY);
     }
 
     public void resetGame() {
@@ -459,6 +521,7 @@ public class Main extends ApplicationAdapter {
         keyItem = new KeyItem("key.png", new Vector2(900,600),29, 13);
         hideGameOverButtons();
         gameOver = false;
+        mapUnlocked = false;
 
 
 
@@ -481,6 +544,7 @@ public class Main extends ApplicationAdapter {
         }
         map.dispose();
         minimap.dispose();
+        fullscreenMap.dispose();
         wall.dispose();
         font.dispose();
         health_bar.dispose();
