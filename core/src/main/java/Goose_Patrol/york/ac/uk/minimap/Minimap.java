@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.Gdx;
 
 /**
  * A minimap representing the main map with the passed texture.
@@ -83,7 +84,7 @@ public class Minimap {
         viewport = new FillViewport(sizeX, sizeY, camera);
 
         // Set textures, should be readable at small scale
-        playerIcon = new Texture("Player.png");
+        playerIcon = new Texture(Gdx.files.internal("minimap_icon.png"));
         gooseIcon = new Texture("GenericIcon.png");
         otherIcon = new Texture("GenericIcon.png");
 
