@@ -121,9 +121,8 @@ public class Main extends ApplicationAdapter {
             map, mapEntities,
             minimapWidth, minimapHeight,
             minimapPosX, margin,
-            800, 800,
             map.getWidth(), map.getHeight(),
-            1f, false
+            2f, false
         );
 
 
@@ -131,7 +130,7 @@ public class Main extends ApplicationAdapter {
         mapOpened = false;
         margin = 50;
         int fullscreenMapWidth = Gdx.graphics.getWidth() - (margin * 2);
-        int fullscreenMapHeight = Gdx.graphics.getHeight() - (margin * 2);
+        int fullscreenMapHeight = Gdx.graphics.getHeight() - (margin * 4);
         // Center map if texture smaller than window
         int fMapPosX = (Gdx.graphics.getWidth()/2) -  (fullscreenMapWidth/2);
         int fMapPosY = (Gdx.graphics.getHeight()/2) -  (fullscreenMapHeight/2);
@@ -141,8 +140,7 @@ public class Main extends ApplicationAdapter {
             fullscreenMapWidth, fullscreenMapHeight,
             fMapPosX, fMapPosY,
             map.getWidth(), map.getHeight(),
-            map.getWidth(), map.getHeight(),
-            1f, false
+            3f, false
         );
 
 
@@ -487,7 +485,7 @@ public class Main extends ApplicationAdapter {
 
         // --- Handle minimap resize ---
         // Calculate position values
-        int minimapWidth = width/6;
+        int minimapWidth = width/5;
         int minimapHeight = minimapWidth; // Guarantees square shape, change wanting to mirror window aspect ratio
         int margin = 10;
         int minimapPosX = width - minimapWidth - margin;
@@ -497,10 +495,11 @@ public class Main extends ApplicationAdapter {
         // --- Handle full screen map resize ---
         margin = 50;
         int fullscreenMapWidth = width - (margin * 2);
-        int fullscreenMapHeight = height - (margin * 2);
+        int fullscreenMapHeight = height - (margin * 4);
         // Center map
         int fMapPosX = (width/2) -  (fullscreenMapWidth/2);
         int fMapPosY = (height/2) -  (fullscreenMapHeight/2);
+
         fullscreenMap.resize(fullscreenMapWidth, fullscreenMapHeight);
         fullscreenMap.setPos(fMapPosX, fMapPosY);
     }
@@ -522,6 +521,7 @@ public class Main extends ApplicationAdapter {
         hideGameOverButtons();
         gameOver = false;
         mapUnlocked = false;
+        mapOpened = false;
 
 
 
