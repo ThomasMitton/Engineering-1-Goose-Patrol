@@ -72,8 +72,6 @@ font-title-export.png
 font2.fnt
 font2.png
 greySquare.png
-hs_err_pid70658.log
-hs_err_pid70686.log
 inventory.png
 key.png
 libgdx.png

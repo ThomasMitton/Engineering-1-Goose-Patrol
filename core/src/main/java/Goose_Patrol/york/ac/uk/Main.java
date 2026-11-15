@@ -2,26 +2,21 @@ package Goose_Patrol.york.ac.uk;
 import Goose_Patrol.york.ac.uk.minimap.MapEntity;
 import Goose_Patrol.york.ac.uk.minimap.Minimap;
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import static com.badlogic.gdx.Gdx.app;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -184,7 +179,7 @@ public class Main extends ApplicationAdapter {
             //activate minigame
         }
 
-        if (keyItem.collected == false && player.hitbox.overlaps(keyItem.hitbox)) {
+        if (!keyItem.collected && player.hitbox.overlaps(keyItem.hitbox)) {
             app.log("Collision", "KEY");
             keyItem.collect(Inventory);
         }
@@ -211,7 +206,7 @@ public class Main extends ApplicationAdapter {
         if (!toastGameActive) {
             player.update();
             for (Goose goose : gooseArray) {
-                goose.update(player.getVector());
+                goose.update(player.getPos());
             }
         }
 
@@ -263,14 +258,14 @@ public class Main extends ApplicationAdapter {
         camera.position.set(
             MathUtils.clamp(MathUtils.clamp(
                 camera.position.x,
-                player.getVector().x - (camera.viewportWidth / 3) + player.texture.getWidth(),
-                player.getVector().x + (camera.viewportWidth / 3)
+                player.getPos().x - (camera.viewportWidth / 3) + player.texture.getWidth(),
+                player.getPos().x + (camera.viewportWidth / 3)
             ), camera.viewportWidth / 2, map.getWidth() - camera.viewportWidth / 2),
 
             MathUtils.clamp(MathUtils.clamp(
                 camera.position.y,
-                player.getVector().y - (camera.viewportHeight / 3) + player.texture.getHeight(),
-                player.getVector().y + (camera.viewportHeight / 3)
+                player.getPos().y - (camera.viewportHeight / 3) + player.texture.getHeight(),
+                player.getPos().y + (camera.viewportHeight / 3)
             ), camera.viewportHeight / 2, map.getHeight() - camera.viewportHeight / 2),
             0
         );
