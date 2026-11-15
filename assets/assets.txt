@@ -69,6 +69,7 @@ font-export.fnt
 font-export.png
 font-title-export.fnt
 font-title-export.png
+hs_err_pid28947.log
 inventory.png
 libgdx.png
 map.png

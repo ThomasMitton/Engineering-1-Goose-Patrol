@@ -1,6 +1,8 @@
 package screens;
 
 import Goose_Patrol.york.ac.uk.*;
+import Goose_Patrol.york.ac.uk.minimap.MapEntity;
+import Goose_Patrol.york.ac.uk.minimap.Minimap;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
@@ -14,7 +16,10 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
+
 import static com.badlogic.gdx.Gdx.app;
 
 public class GameScreen extends ScreenAdapter {
@@ -182,7 +187,7 @@ public class GameScreen extends ScreenAdapter {
         }
 
         minimap.update();
-        minimap.render(batch);
+        minimap.render(game.batch);
         viewport.apply();
     }
 
@@ -258,7 +263,6 @@ public class GameScreen extends ScreenAdapter {
     public void resize(int width, int height) {
         uiCamera.setToOrtho(false, width, height);
         viewport.update(width, height, true);
-        GameOverScreen.resize(width,height);
 
         // --- Handle minimap resize ---
         // Calculate position values
