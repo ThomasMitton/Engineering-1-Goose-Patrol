@@ -8,6 +8,7 @@ TitleScreen.png
 Wall.png
 beep.mp3
 bread.png
+bread_inactive.png
 flat-earth-ui.atlas
 flat-earth-ui.json
 flat-earth-ui.png
