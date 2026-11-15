@@ -4,9 +4,11 @@ Goose.png
 Open Sans.fnt
 Open Sans.png
 Player.png
+TitleScreen.png
 Wall.png
 beep.mp3
 bread.png
+bread_inactive.png
 flat-earth-ui.atlas
 flat-earth-ui.json
 flat-earth-ui.png
@@ -72,8 +74,10 @@ font-title-export.png
 font2.fnt
 font2.png
 greySquare.png
+hs_err_pid37183.log
 inventory.png
 key.png
 libgdx.png
 map.png
+portal.png
 toaster.png

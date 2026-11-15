@@ -31,6 +31,7 @@ public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
     private Player player;
     private Array<Goose> gooseArray;
+    private Array<BreadItem>  breadItemArray;
     private Texture map;
     private OrthographicCamera camera;
     private OrthographicCamera uiCamera;
@@ -39,6 +40,8 @@ public class Main extends ApplicationAdapter {
     private String myText;
     private Timer timer;
     private String displayTime;
+    private Portal portal1;
+    private Portal portal2;
     private HealthBar health_bar;
     public BreadPoints breadPoints;
     public static BreadPoints staticBreadPoints;
@@ -46,7 +49,7 @@ public class Main extends ApplicationAdapter {
     public Sound sound;
     private GameOverScreen GameOverScreen;
     private boolean gameOver = false;
-
+    private Texture titleScreen;
     private ItemCounter ItemCounter;
     private GameOver GameOver;
     private Inventory Inventory;
@@ -72,19 +75,21 @@ public class Main extends ApplicationAdapter {
     private boolean mapUnlocked;
     private boolean mapOpened;
 
+    private BreadIcon breadIcon;
 
     @Override
     public void create() {
         GameOverScreen = new GameOverScreen(this);
         map = new Texture(Gdx.files.internal("map.png"));
         gooseArray = new Array<>();
+        breadItemArray = new Array<>();
         toaster = new Toaster("toaster.png", new Vector2(900,300),39, 31);
         keyItem = new KeyItem("key.png", new Vector2(900,600),29, 13);
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         player = new Player("Player.png", new Vector2(140, 210), 200f, map.getWidth(), map.getHeight());
         wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
-
+        titleScreen = new Texture("TitleScreen.png");
         camera = new OrthographicCamera();
         viewport = new ExtendViewport(800, 450, camera);
         font = new BitmapFont(Gdx.files.internal("Open Sans.fnt"));
@@ -94,7 +99,10 @@ public class Main extends ApplicationAdapter {
         pointCounter = BreadPoints.getCounter();
         sound = Gdx.audio.newSound(Gdx.files.internal("beep.mp3"));
         greyBackgroundSquare = new Texture(Gdx.files.internal("greySquare.png"));
-
+        portal1 = new Portal("portal.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight()))));
+        portal2 = new Portal("portal.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight()))));
+        app.log("Portal1 pos",portal1.pos+"");
+        app.log("Portal2 pos",portal2.pos+"");
 
         uiCamera = new OrthographicCamera();
         uiCamera.setToOrtho(
@@ -151,7 +159,7 @@ public class Main extends ApplicationAdapter {
         GameOver = new GameOver(health_bar);
         resetGame = new ResetGame();
 
-
+        breadIcon = new BreadIcon((float) Gdx.graphics.getWidth() / 2 - 54, 30, 54, 28);
 
         Inventory = new Inventory();
 
@@ -162,10 +170,21 @@ public class Main extends ApplicationAdapter {
     public void render() {
         viewport.apply();
 
-        if(currentState == GameState.MAIN_MENU) {
+        if (currentState == GameState.MAIN_MENU) {
             renderMainMenu();
             return;
         }
+
+        for (BreadItem breadItem : breadItemArray) {
+            if (player.hitbox.overlaps(breadItem.hitbox)) {
+                breadItemArray.removeValue(breadItem, false);
+                mapEntities.removeValue(breadItem, false);
+                BreadPoints.incrementPoints();
+            }
+        }
+
+
+
 
 
         for (Goose goose : gooseArray) {
@@ -173,22 +192,39 @@ public class Main extends ApplicationAdapter {
                 gooseArray.removeValue(goose, false);
                 mapEntities.removeValue(goose, false);
                 health_bar.health = health_bar.health - 1;
-                if (health_bar.health <=0) {
+                if (health_bar.health <= 0) {
                     gameOver = true;
                     showGameOverButtons();
                 }
             }
         }
-        if (System.currentTimeMillis() -Timer.startTime >= 300000){
+
+        for(BreadItem breadItem : breadItemArray){
+            if (player.hitbox.overlaps(breadItem.hitbox)) {
+                breadItem.pickedUp();
+                breadItemArray.removeValue(breadItem, false);
+            }
+        }
+
+        if (System.currentTimeMillis() - Timer.startTime >= 300000) {
             gameOver = true;
             showGameOverButtons();
         }
-
+        if (keyItem.collected) {
+            if (player.hitbox.overlaps(portal1.hitbox)) {
+                player.pos = new Vector2(portal2.pos.x + 100, portal2.pos.y);
+            }
+            if (player.hitbox.overlaps(portal2.hitbox)) {
+                player.pos = new Vector2(portal1.pos.x + 100, portal1.pos.y);
+            }
+        }
         if (toaster != null && player.hitbox.overlaps(toaster.hitbox)) {
             toastGameActive = true;
 
+            ItemCounter.EventsActivated++;
+
             toaster.dispose();
-            toaster=null;
+            toaster = null;
 
             markerPosition = 0;
             movingRight = true;
@@ -203,11 +239,12 @@ public class Main extends ApplicationAdapter {
         }
 
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
             for (Goose goose : gooseArray) {
                 boolean destroy = goose.beFed(player.getPos(), BreadPoints.getCounter());
                 if (destroy) {
                     gooseArray.removeValue(goose, false);
+                    mapEntities.removeValue(goose, false);
                     app.log("Collision", "Target Neutralised");
                 }
             }
@@ -236,8 +273,7 @@ public class Main extends ApplicationAdapter {
             if (movingRight) {
                 markerPosition += toasterSpeed * delta;
 
-            }
-            else {
+            } else {
                 markerPosition -= toasterSpeed * delta;
             }
 
@@ -286,36 +322,34 @@ public class Main extends ApplicationAdapter {
 
             if (markerPosition >= 150 && markerPosition <= 200) {
                 app.log("Toast", "Perfect");
-            }
-
-            else if (markerPosition >= 100 && markerPosition <= 250) {
+            } else if (markerPosition >= 100 && markerPosition <= 250) {
                 app.log("Toast", "Good");
-            }
-
-            else {
+            } else {
                 app.log("Toast", "Burnt");
             }
 
             toastGameActive = false;
         }
 
-        if (!toastGameActive && duckTimer >1f) {
+        if (!toastGameActive && duckTimer > 1f) {
             duckTimer = 0;
             addGoose();
-            app.log("Goose added","big if true");
+            addBreadItem();
+            app.log("Goose added", "big if true");
         }
+
 
         camera.position.set(
             MathUtils.clamp(MathUtils.clamp(
                 camera.position.x,
-                player.getPos().x - (camera.viewportWidth / 3) + player.texture.getWidth(),
-                player.getPos().x + (camera.viewportWidth / 3)
+                player.getPos().x - (camera.viewportWidth / 10) + player.texture.getWidth(),
+                player.getPos().x + (camera.viewportWidth / 10)
             ), camera.viewportWidth / 2, map.getWidth() - camera.viewportWidth / 2),
 
             MathUtils.clamp(MathUtils.clamp(
                 camera.position.y,
-                player.getPos().y - (camera.viewportHeight / 3) + player.texture.getHeight(),
-                player.getPos().y + (camera.viewportHeight / 3)
+                player.getPos().y - (camera.viewportHeight / 10) + player.texture.getHeight(),
+                player.getPos().y + (camera.viewportHeight / 10)
             ), camera.viewportHeight / 2, map.getHeight() - camera.viewportHeight / 2),
             0
         );
@@ -334,6 +368,10 @@ public class Main extends ApplicationAdapter {
             goose.render(batch);
         }
 
+        for (BreadItem breadItem : breadItemArray) {
+            breadItem.render(batch);
+        }
+
         if (toaster != null) {
             toaster.render(batch);
         }
@@ -344,7 +382,10 @@ public class Main extends ApplicationAdapter {
         }
         wall.render(batch);
 
-
+        if (keyItem.collected) {
+        portal1.render(batch);
+        portal2.render(batch);
+    }
         batch.end();
 
 
@@ -468,6 +509,7 @@ public class Main extends ApplicationAdapter {
 
 
         Inventory.draw();
+        breadIcon.render(batch, uiCamera.combined);
 
         if(gameOver) {
             GameOverScreen.display();
@@ -482,6 +524,7 @@ public class Main extends ApplicationAdapter {
         viewport.update(width, height, true);
         GameOverScreen.resize(width,height);
         Inventory.resize(width,height);
+        breadIcon.setPosition(width / 2f - 57, 28);
 
         // --- Handle minimap resize ---
         // Calculate position values
@@ -505,7 +548,7 @@ public class Main extends ApplicationAdapter {
     }
 
     public void resetGame() {
-        resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, Inventory, mapEntities);
+        resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, Inventory, mapEntities, breadItemArray);
 
 
         if (toaster != null) {
@@ -531,9 +574,14 @@ public class Main extends ApplicationAdapter {
     public void dispose() {
         batch.dispose();
         player.dispose();
+        portal1.dispose();
+        portal2.dispose();
         shapeRenderer.dispose();
         for (Goose goose : gooseArray) {
             goose.dispose();
+        }
+        for (BreadItem breadItem : breadItemArray){
+            breadItem.dispose();
         }
         if (toaster != null) {
             toaster.dispose();
@@ -552,6 +600,7 @@ public class Main extends ApplicationAdapter {
         sound.dispose();
         Inventory.dispose();
         GameOverScreen.dispose();
+        breadIcon.dispose();
     }
 
     private void addGoose() {
@@ -560,17 +609,21 @@ public class Main extends ApplicationAdapter {
         mapEntities.add(newGoose);
     }
 
+    private void addBreadItem(){
+        BreadItem newBreadItem = new BreadItem("bread.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight()))));
+        breadItemArray.add(newBreadItem);
+        mapEntities.add(newBreadItem);
+    }
+
 
     //Renders the Main Menu Screen (Work in progress).
     private void renderMainMenu() {
         com.badlogic.gdx.utils.ScreenUtils.clear(1f,1f,1f,1f);
 
-        uiCamera.update();
-        batch.setProjectionMatrix(uiCamera.combined);
-
+        viewport.apply();
+        batch.setProjectionMatrix(viewport.getCamera().combined);
         batch.begin();
-        font.draw(batch, "GOOSE PATROL", 500,2*uiCamera.viewportHeight/3);
-        font.draw(batch, "Click anywhere or press space to play", 500, uiCamera.viewportHeight/2);
+        batch.draw(titleScreen,0,0,viewport.getWorldWidth(),viewport.getWorldHeight());
         batch.end();
 
         if(Gdx.input.isTouched() || Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE)) {

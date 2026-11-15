@@ -12,24 +12,24 @@ import com.badlogic.gdx.Gdx;
 public class Inventory {
     private Stage inventory;
     private Texture inventoryImage;
-    
+
     public Inventory(){
         inventory = new Stage(new ScreenViewport());
         inventory.getViewport().update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),true);
         inventoryImage = new Texture(Gdx.files.internal("inventory.png"));
         createInv();
         layout();
-        
-        
+
+
     }
-    
+
     private void createInv() {
         Image inv = new Image(inventoryImage);
         inv.setName("inv");
-        inv.setSize(127,63);
+        inv.setSize(189,63);
         inventory.addActor(inv);
     }
-    
+
     public void layout(){
         float x = inventory.getViewport().getWorldWidth()/2f -64;
         Actor inv = inventory.getRoot().findActor("inv");
@@ -40,35 +40,34 @@ public class Inventory {
         if (key != null){
             key.setPosition(x + 55,8);
         }
-        
+
     }
-    
+
     public void resize(int width, int height) {
         inventory.getViewport().update(width,height,true);
         layout();
     }
-    
+
     public void addKey(Image keyImage) {
         keyImage.setName("key");
         inventory.addActor(keyImage);
         layout();
     }
-    
-    
+
     public void reset() {
         inventory.clear();
         createInv();
         layout();
     }
-    
+
     public void draw(){
         inventory.act();
         inventory.draw();
     }
-    
+
     public void dispose() {
         inventory.dispose();
         inventoryImage.dispose();
-        
+
     }
 }

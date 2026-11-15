@@ -11,7 +11,8 @@ public class ResetGame {
 
 
     public void reset(Player player, HealthBar health, Array<Goose> gooseArray, ItemCounter itemCounter,
-                      BreadPoints breadPoints, Inventory Inventory, Array<MapEntity> mapEntities) {
+                      BreadPoints breadPoints, Inventory Inventory, Array<MapEntity> mapEntities,
+                      Array<BreadItem> breadItemArray) {
 
         player.pos.set(140,210);
 
