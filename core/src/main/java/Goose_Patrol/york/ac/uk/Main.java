@@ -232,6 +232,38 @@ public class Main extends ApplicationAdapter {
 
             if (markerPosition >= 150 && markerPosition <= 200) {
                 app.log("Toast", "Perfect");
+                for (int i = 0; i < 10; i++) {
+                    BreadPoints.incrementPoints();
+                }
+            } else if (markerPosition >= 100 && markerPosition <= 250) {
+                app.log("Toast", "Good");
+                for (int i = 0; i < 5; i++) {
+                    BreadPoints.incrementPoints();
+                }
+            } else {
+                app.log("Toast", "Burnt");
+                for (int i = 0; i < 1; i++) {
+                    BreadPoints.incrementPoints();
+                }
+            }
+
+            toastGameActive = false;
+
+            toaster = new Toaster(
+                "toaster.png",
+                new Vector2(
+                    MathUtils.random(100, map.getWidth() - 100),
+                    MathUtils.random(100, map.getHeight() - 100)
+                ),
+                39,
+                31
+            );
+        }
+
+        if (toastGameActive && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+
+            if (markerPosition >= 150 && markerPosition <= 200) {
+                app.log("Toast", "Perfect");
             }
 
             else if (markerPosition >= 100 && markerPosition <= 250) {
