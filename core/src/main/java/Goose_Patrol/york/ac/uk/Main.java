@@ -2,26 +2,21 @@ package Goose_Patrol.york.ac.uk;
 import Goose_Patrol.york.ac.uk.minimap.MapEntity;
 import Goose_Patrol.york.ac.uk.minimap.Minimap;
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import static com.badlogic.gdx.Gdx.app;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -52,7 +47,7 @@ public class Main extends ApplicationAdapter {
     public Sound sound;
     private GameOverScreen GameOverScreen;
     private boolean gameOver = false;
-
+    private Texture titleScreen;
     private ItemCounter ItemCounter;
     private GameOver GameOver;
     private Inventory Inventory;
@@ -88,9 +83,9 @@ public class Main extends ApplicationAdapter {
         shapeRenderer = new ShapeRenderer();
         player = new Player("Player.png", new Vector2(140, 210), 200f, map.getWidth(), map.getHeight());
         wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
-
+        titleScreen = new Texture("TitleScreen.png");
         camera = new OrthographicCamera();
-        viewport = new FitViewport(800, 450, camera);
+        viewport = new ExtendViewport(800, 450, camera);
         font = new BitmapFont(Gdx.files.internal("Open Sans.fnt"));
         camera.setToOrtho(false, 800, 600);
         font = new BitmapFont(Gdx.files.internal("font2.fnt"));
@@ -163,6 +158,7 @@ public class Main extends ApplicationAdapter {
 
 
 
+
         for (Goose goose : gooseArray) {
             if (player.hitbox.overlaps(goose.hitbox)) {
                 gooseArray.removeValue(goose, false);
@@ -190,6 +186,8 @@ public class Main extends ApplicationAdapter {
         if (toaster != null && player.hitbox.overlaps(toaster.hitbox)) {
             toastGameActive = true;
 
+            ItemCounter.EventsActivated++;
+
             toaster.dispose();
             toaster=null;
 
@@ -200,7 +198,7 @@ public class Main extends ApplicationAdapter {
             //activate minigame
         }
 
-        if (keyItem.collected == false && player.hitbox.overlaps(keyItem.hitbox)) {
+        if (!keyItem.collected && player.hitbox.overlaps(keyItem.hitbox)) {
             app.log("Collision", "KEY");
             keyItem.collect(Inventory);
         }
@@ -211,6 +209,7 @@ public class Main extends ApplicationAdapter {
                 boolean destroy = goose.beFed(player.getPos(), BreadPoints.getCounter());
                 if (destroy) {
                     gooseArray.removeValue(goose, false);
+                    mapEntities.removeValue(goose, false);
                     app.log("Collision", "Target Neutralised");
                 }
             }
@@ -227,7 +226,7 @@ public class Main extends ApplicationAdapter {
         if (!toastGameActive) {
             player.update();
             for (Goose goose : gooseArray) {
-                goose.update(player.getVector());
+                goose.update(player.getPos());
             }
         }
 
@@ -251,6 +250,38 @@ public class Main extends ApplicationAdapter {
             if (markerPosition <= 0) {
                 movingRight = true;
             }
+        }
+
+        if (toastGameActive && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+
+            if (markerPosition >= 150 && markerPosition <= 200) {
+                app.log("Toast", "Perfect");
+                for (int i = 0; i < 10; i++) {
+                    BreadPoints.incrementPoints();
+                }
+            } else if (markerPosition >= 100 && markerPosition <= 250) {
+                app.log("Toast", "Good");
+                for (int i = 0; i < 5; i++) {
+                    BreadPoints.incrementPoints();
+                }
+            } else {
+                app.log("Toast", "Burnt");
+                for (int i = 0; i < 1; i++) {
+                    BreadPoints.incrementPoints();
+                }
+            }
+
+            toastGameActive = false;
+
+            toaster = new Toaster(
+                "toaster.png",
+                new Vector2(
+                    MathUtils.random(100, map.getWidth() - 100),
+                    MathUtils.random(100, map.getHeight() - 100)
+                ),
+                39,
+                31
+            );
         }
 
         if (toastGameActive && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
@@ -281,14 +312,14 @@ public class Main extends ApplicationAdapter {
         camera.position.set(
             MathUtils.clamp(MathUtils.clamp(
                 camera.position.x,
-                player.getVector().x - (camera.viewportWidth / 3) + player.texture.getWidth(),
-                player.getVector().x + (camera.viewportWidth / 3)
+                player.getPos().x - (camera.viewportWidth / 3) + player.texture.getWidth(),
+                player.getPos().x + (camera.viewportWidth / 3)
             ), camera.viewportWidth / 2, map.getWidth() - camera.viewportWidth / 2),
 
             MathUtils.clamp(MathUtils.clamp(
                 camera.position.y,
-                player.getVector().y - (camera.viewportHeight / 3) + player.texture.getHeight(),
-                player.getVector().y + (camera.viewportHeight / 3)
+                player.getPos().y - (camera.viewportHeight / 3) + player.texture.getHeight(),
+                player.getPos().y + (camera.viewportHeight / 3)
             ), camera.viewportHeight / 2, map.getHeight() - camera.viewportHeight / 2),
             0
         );
@@ -509,12 +540,10 @@ public class Main extends ApplicationAdapter {
     private void renderMainMenu() {
         com.badlogic.gdx.utils.ScreenUtils.clear(1f,1f,1f,1f);
 
-        uiCamera.update();
-        batch.setProjectionMatrix(uiCamera.combined);
-
+        viewport.apply();
+        batch.setProjectionMatrix(viewport.getCamera().combined);
         batch.begin();
-        font.draw(batch, "GOOSE PATROL", 500,2*uiCamera.viewportHeight/3);
-        font.draw(batch, "Click anywhere or press space to play", 500, uiCamera.viewportHeight/2);
+        batch.draw(titleScreen,0,0,viewport.getWorldWidth(),viewport.getWorldHeight());
         batch.end();
 
         if(Gdx.input.isTouched() || Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE)) {
