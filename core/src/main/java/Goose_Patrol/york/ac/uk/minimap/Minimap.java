@@ -20,6 +20,8 @@ public class Minimap {
     private final Texture playerIcon;
     private final Texture gooseIcon;
     private final Texture itemIcon;
+    private final Texture busIcon;
+    private final Texture portalIcon;
     private final Texture otherIcon;
 
 
@@ -88,6 +90,8 @@ public class Minimap {
         playerIcon = new Texture(Gdx.files.internal("minimap_icon.png"));
         gooseIcon = new Texture("EnemyIcon.png");
         itemIcon = new Texture("ItemIcon.png");
+        busIcon = new Texture("BusIcon.png");
+        portalIcon = new Texture("PortalIcon.png");
         otherIcon = new Texture("GenericIcon.png");
 
     }
@@ -144,6 +148,12 @@ public class Minimap {
                     break;
                 case BREAD_ITEM:
                     icon = itemIcon;
+                    break;
+                case BUS:
+                    icon = busIcon;
+                    break;
+                case PORTAL:
+                    icon = portalIcon;
                     break;
                 case PLAYER:
                     continue; // Don't draw player yet
