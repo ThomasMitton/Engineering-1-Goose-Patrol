@@ -26,7 +26,6 @@ public class GameOverScreen {
         this.game = game;
         //stage setup
         stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage);
         //importing skins for buttons ect
         skin = new Skin(Gdx.files.internal("flat-earth-ui.json"));
         
@@ -81,4 +80,13 @@ public class GameOverScreen {
         stage.dispose();
         skin.dispose();
     }
+    
+    public void show() {
+        Gdx.input.setInputProcessor(stage);
+    }
+    
+    public void hide() {
+        Gdx.input.setInputProcessor(null);
+    }
+    
 }

@@ -12,26 +12,6 @@ public class Toaster  extends Entity{
         this.height = height;
         super.hitbox();
     }
-
-    public void checkCollisions(Vector2 targetPos) {
-       if (targetPos.x > pos.x - 8 && targetPos.x < pos.x - 8) {
-            //collision with right side
-            targetPos.x = pos.x - 8;
-        }
-        if (targetPos.x < pos.x + 8 && targetPos.x > pos.x + 8) {
-            //collision with left side
-            targetPos.x = pos.y + 8;
-        }
-        if (targetPos.y < pos.y + 8 && targetPos.y > pos.y + 8) {
-            //collision with top side
-            targetPos.y = pos.y + 8;
-        }
-        if (targetPos.y > pos.y - 8 && targetPos.y < pos.y - 8) {
-            //collision with bottom side
-            targetPos.y = pos.y - 8;
-        }
-    }
-
     
 
     public void dispose() {

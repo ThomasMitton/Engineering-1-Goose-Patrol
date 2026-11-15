@@ -9,6 +9,7 @@ public class GameOver {
    private Timer timer;
    public GameOverScreen GameOverScreen;
    public boolean gameOver = false;
+   public Main main;
 
    public GameOver (HealthBar health_bar) {
        this.health_bar = health_bar;
@@ -22,11 +23,13 @@ public class GameOver {
    public void display(){
        //logic for game over
        if (health_bar.health <= 0) {
-           //needs to replaced with final gameover screen
+           main.showGameOverButtons();
            gameOver = true;
         }
         if (Time_zero()) {
-            ScreenUtils.clear(Color.BLACK);
+           main.showGameOverButtons();
+           gameOver = true;
+            
 
         }
         
