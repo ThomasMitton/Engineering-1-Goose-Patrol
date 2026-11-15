@@ -31,6 +31,7 @@ public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
     private Player player;
     private Array<Goose> gooseArray;
+    private Array<BreadItem>  breadItemArray;
     private Texture map;
     private OrthographicCamera camera;
     private OrthographicCamera uiCamera;
@@ -76,6 +77,7 @@ public class Main extends ApplicationAdapter {
         GameOverScreen = new GameOverScreen(this);
         map = new Texture(Gdx.files.internal("map.png"));
         gooseArray = new Array<>();
+        breadItemArray = new Array<>();
         toaster = new Toaster("toaster.png", new Vector2(900,300),39, 31);
         keyItem = new KeyItem("key.png", new Vector2(900,600),29, 13);
         batch = new SpriteBatch();
@@ -146,6 +148,17 @@ public class Main extends ApplicationAdapter {
             return;
         }
 
+        for (BreadItem breadItem : breadItemArray) {
+            if (player.hitbox.overlaps(breadItem.hitbox)) {
+                breadItemArray.removeValue(breadItem, false);
+                mapEntities.removeValue(breadItem, false);
+                BreadPoints.incrementPoints();
+            }
+        }
+
+
+
+
 
         for (Goose goose : gooseArray) {
             if (player.hitbox.overlaps(goose.hitbox)) {
@@ -158,6 +171,14 @@ public class Main extends ApplicationAdapter {
                 }
             }
         }
+
+        for(BreadItem breadItem : breadItemArray){
+            if (player.hitbox.overlaps(breadItem.hitbox)) {
+                breadItem.pickedUp();
+                breadItemArray.removeValue(breadItem, false);
+            }
+        }
+
         if (System.currentTimeMillis() -Timer.startTime >= 300000){
             gameOver = true;
             showGameOverButtons();
@@ -284,8 +305,10 @@ public class Main extends ApplicationAdapter {
         if (!toastGameActive && duckTimer >1f) {
             duckTimer = 0;
             addGoose();
+            addBreadItem();
             app.log("Goose added","big if true");
         }
+
 
         camera.position.set(
             MathUtils.clamp(MathUtils.clamp(
@@ -314,6 +337,10 @@ public class Main extends ApplicationAdapter {
         player.render(batch);
         for (Goose goose : gooseArray) {
             goose.render(batch);
+        }
+
+        for (BreadItem breadItem : breadItemArray) {
+            breadItem.render(batch);
         }
 
         if (toaster != null) {
@@ -450,7 +477,7 @@ public class Main extends ApplicationAdapter {
     }
 
     public void resetGame() {
-        resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, Inventory, mapEntities);
+        resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, Inventory, mapEntities, breadItemArray);
 
 
         if (toaster != null) {
@@ -478,6 +505,9 @@ public class Main extends ApplicationAdapter {
         for (Goose goose : gooseArray) {
             goose.dispose();
         }
+        for (BreadItem breadItem : breadItemArray){
+            breadItem.dispose();
+        }
         if (toaster != null) {
             toaster.dispose();
         }
@@ -501,6 +531,12 @@ public class Main extends ApplicationAdapter {
         Goose newGoose = new Goose("Goose.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight()))));
         gooseArray.add(newGoose);
         mapEntities.add(newGoose);
+    }
+
+    private void addBreadItem(){
+        BreadItem newBreadItem = new BreadItem("bread.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight()))));
+        breadItemArray.add(newBreadItem);
+        mapEntities.add(newBreadItem);
     }
 
 
