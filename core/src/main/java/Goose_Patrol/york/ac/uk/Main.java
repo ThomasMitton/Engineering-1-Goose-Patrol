@@ -40,6 +40,8 @@ public class Main extends ApplicationAdapter {
     private String myText;
     private Timer timer;
     private String displayTime;
+    private Portal portal1;
+    private Portal portal2;
     private HealthBar health_bar;
     public BreadPoints breadPoints;
     public static BreadPoints staticBreadPoints;
@@ -68,9 +70,13 @@ public class Main extends ApplicationAdapter {
     private Stage stage;
 
     private Minimap minimap;
+    private Minimap fullscreenMap;
     private Array<MapEntity> mapEntities;
     private Bus bus;
+    private boolean mapUnlocked;
+    private boolean mapOpened;
 
+    private BreadIcon breadIcon;
 
     @Override
     public void create() {
@@ -94,6 +100,10 @@ public class Main extends ApplicationAdapter {
         pointCounter = BreadPoints.getCounter();
         sound = Gdx.audio.newSound(Gdx.files.internal("beep.mp3"));
         greyBackgroundSquare = new Texture(Gdx.files.internal("greySquare.png"));
+        portal1 = new Portal("portal.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight()))));
+        portal2 = new Portal("portal.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight()))));
+        app.log("Portal1 pos",portal1.pos+"");
+        app.log("Portal2 pos",portal2.pos+"");
         bus = new Bus("bus.png", new Vector2(map.getWidth() - 200, map.getHeight() - 250));
 
 
@@ -107,6 +117,7 @@ public class Main extends ApplicationAdapter {
 
 
         // --- Create minimap ---
+        mapUnlocked = true;
         // Create list of MapEntity to pass to minimap
         mapEntities = new Array<>();
         mapEntities.add(player);
@@ -122,10 +133,28 @@ public class Main extends ApplicationAdapter {
             map, mapEntities,
             minimapWidth, minimapHeight,
             minimapPosX, margin,
-            800, 800,
             map.getWidth(), map.getHeight(),
-            1f
+            2f, false
         );
+
+
+        // --- Create full screen map ---
+        mapOpened = false;
+        margin = 50;
+        int fullscreenMapWidth = Gdx.graphics.getWidth() - (margin * 2);
+        int fullscreenMapHeight = Gdx.graphics.getHeight() - (margin * 4);
+        // Center map if texture smaller than window
+        int fMapPosX = (Gdx.graphics.getWidth()/2) -  (fullscreenMapWidth/2);
+        int fMapPosY = (Gdx.graphics.getHeight()/2) -  (fullscreenMapHeight/2);
+
+        fullscreenMap = new Minimap(
+            map, mapEntities,
+            fullscreenMapWidth, fullscreenMapHeight,
+            fMapPosX, fMapPosY,
+            map.getWidth(), map.getHeight(),
+            3f, false
+        );
+
 
 
         health_bar = new HealthBar();
@@ -134,7 +163,7 @@ public class Main extends ApplicationAdapter {
         GameOver = new GameOver(health_bar);
         resetGame = new ResetGame();
 
-
+        breadIcon = new BreadIcon((float) Gdx.graphics.getWidth() / 2 - 54, 30, 54, 28);
 
         Inventory = new Inventory();
 
@@ -143,9 +172,9 @@ public class Main extends ApplicationAdapter {
     //TODO: split update() and render() functions for clarity
     @Override
     public void render() {
+        viewport.apply();
 
-
-        if(currentState == GameState.MAIN_MENU) {
+        if (currentState == GameState.MAIN_MENU) {
             renderMainMenu();
             return;
         }
@@ -167,7 +196,7 @@ public class Main extends ApplicationAdapter {
                 gooseArray.removeValue(goose, false);
                 mapEntities.removeValue(goose, false);
                 health_bar.health = health_bar.health - 1;
-                if (health_bar.health <=0) {
+                if (health_bar.health <= 0) {
                     gameOver = true;
                     showGameOverButtons();
                 }
@@ -188,18 +217,25 @@ public class Main extends ApplicationAdapter {
         }
 
 
-        if (System.currentTimeMillis() -Timer.startTime >= 300000){
+        if (System.currentTimeMillis() - Timer.startTime >= 300000) {
             gameOver = true;
             showGameOverButtons();
         }
-
+        if (keyItem.collected) {
+            if (player.hitbox.overlaps(portal1.hitbox)) {
+                player.pos = new Vector2(portal2.pos.x + 100, portal2.pos.y);
+            }
+            if (player.hitbox.overlaps(portal2.hitbox)) {
+                player.pos = new Vector2(portal1.pos.x + 100, portal1.pos.y);
+            }
+        }
         if (toaster != null && player.hitbox.overlaps(toaster.hitbox)) {
             toastGameActive = true;
 
             ItemCounter.EventsActivated++;
 
             toaster.dispose();
-            toaster=null;
+            toaster = null;
 
             markerPosition = 0;
             movingRight = true;
@@ -214,7 +250,7 @@ public class Main extends ApplicationAdapter {
         }
 
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
             for (Goose goose : gooseArray) {
                 boolean destroy = goose.beFed(player.getPos(), BreadPoints.getCounter());
                 if (destroy) {
@@ -248,8 +284,7 @@ public class Main extends ApplicationAdapter {
             if (movingRight) {
                 markerPosition += toasterSpeed * delta;
 
-            }
-            else {
+            } else {
                 markerPosition -= toasterSpeed * delta;
             }
 
@@ -298,38 +333,34 @@ public class Main extends ApplicationAdapter {
 
             if (markerPosition >= 150 && markerPosition <= 200) {
                 app.log("Toast", "Perfect");
-            }
-
-            else if (markerPosition >= 100 && markerPosition <= 250) {
+            } else if (markerPosition >= 100 && markerPosition <= 250) {
                 app.log("Toast", "Good");
-            }
-
-            else {
+            } else {
                 app.log("Toast", "Burnt");
             }
 
             toastGameActive = false;
         }
 
-        if (!toastGameActive && duckTimer >1f) {
+        if (!toastGameActive && duckTimer > 1f) {
             duckTimer = 0;
             addGoose();
             addBreadItem();
-            app.log("Goose added","big if true");
+            app.log("Goose added", "big if true");
         }
 
 
         camera.position.set(
             MathUtils.clamp(MathUtils.clamp(
                 camera.position.x,
-                player.getPos().x - (camera.viewportWidth / 3) + player.texture.getWidth(),
-                player.getPos().x + (camera.viewportWidth / 3)
+                player.getPos().x - (camera.viewportWidth / 10) + player.texture.getWidth(),
+                player.getPos().x + (camera.viewportWidth / 10)
             ), camera.viewportWidth / 2, map.getWidth() - camera.viewportWidth / 2),
 
             MathUtils.clamp(MathUtils.clamp(
                 camera.position.y,
-                player.getPos().y - (camera.viewportHeight / 3) + player.texture.getHeight(),
-                player.getPos().y + (camera.viewportHeight / 3)
+                player.getPos().y - (camera.viewportHeight / 10) + player.texture.getHeight(),
+                player.getPos().y + (camera.viewportHeight / 10)
             ), camera.viewportHeight / 2, map.getHeight() - camera.viewportHeight / 2),
             0
         );
@@ -363,7 +394,10 @@ public class Main extends ApplicationAdapter {
         }
         wall.render(batch);
 
-
+        if (keyItem.collected) {
+        portal1.render(batch);
+        portal2.render(batch);
+    }
         batch.end();
 
 
@@ -454,11 +488,40 @@ public class Main extends ApplicationAdapter {
 
         batch.end();
 
+        // --- Map logic/rendering ---
+        // Check if map opened
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)
+                || Gdx.input.isKeyJustPressed(Input.Keys.M)) {
+            mapOpened = !mapOpened;
+        }
+
+        // Draw minimap/map depending on whether unlocked
+        if (mapUnlocked) {
+            if (mapOpened) {
+                // Show fullscreen map
+                fullscreenMap.show();
+                minimap.hide();
+
+            } else {
+                // Show minimap
+                minimap.show();
+                fullscreenMap.hide();
+            }
+        }
+
+        // Show minimap (if hidden, does nothing)
         minimap.update();
         minimap.render(batch);
-        viewport.apply();
+
+        // Show fullscreen map (if hidden, does nothing)
+        fullscreenMap.update();
+        fullscreenMap.render(batch);
+        viewport.apply(); // reset viewport to game viewport
+
+
 
         Inventory.draw();
+        breadIcon.render(batch, uiCamera.combined);
 
         if(gameOver) {
             GameOverScreen.display();
@@ -473,6 +536,7 @@ public class Main extends ApplicationAdapter {
         viewport.update(width, height, true);
         GameOverScreen.resize(width,height);
         Inventory.resize(width,height);
+        breadIcon.setPosition(width / 2f - 57, 28);
 
         // --- Handle minimap resize ---
         // Calculate position values
@@ -482,6 +546,17 @@ public class Main extends ApplicationAdapter {
         int minimapPosX = width - minimapWidth - margin;
         minimap.resize(minimapWidth, minimapHeight);
         minimap.setPos(minimapPosX, margin);
+
+        // --- Handle full screen map resize ---
+        margin = 50;
+        int fullscreenMapWidth = width - (margin * 2);
+        int fullscreenMapHeight = height - (margin * 4);
+        // Center map
+        int fMapPosX = (width/2) -  (fullscreenMapWidth/2);
+        int fMapPosY = (height/2) -  (fullscreenMapHeight/2);
+
+        fullscreenMap.resize(fullscreenMapWidth, fullscreenMapHeight);
+        fullscreenMap.setPos(fMapPosX, fMapPosY);
     }
 
     public void resetGame() {
@@ -500,6 +575,8 @@ public class Main extends ApplicationAdapter {
         keyItem = new KeyItem("key.png", new Vector2(900,600),29, 13);
         hideGameOverButtons();
         gameOver = false;
+        mapUnlocked = false;
+        mapOpened = false;
 
 
 
@@ -509,6 +586,8 @@ public class Main extends ApplicationAdapter {
     public void dispose() {
         batch.dispose();
         player.dispose();
+        portal1.dispose();
+        portal2.dispose();
         shapeRenderer.dispose();
         for (Goose goose : gooseArray) {
             goose.dispose();
@@ -525,6 +604,7 @@ public class Main extends ApplicationAdapter {
         }
         map.dispose();
         minimap.dispose();
+        fullscreenMap.dispose();
         wall.dispose();
         font.dispose();
         health_bar.dispose();
@@ -533,6 +613,7 @@ public class Main extends ApplicationAdapter {
         Inventory.dispose();
         GameOverScreen.dispose();
         bus.dispose();
+        breadIcon.dispose();
     }
 
     private void addGoose() {
