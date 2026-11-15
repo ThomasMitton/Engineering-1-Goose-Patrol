@@ -69,6 +69,7 @@ public class Main extends ApplicationAdapter {
 
     private Minimap minimap;
     private Array<MapEntity> mapEntities;
+    private Bus bus;
 
 
     @Override
@@ -93,6 +94,7 @@ public class Main extends ApplicationAdapter {
         pointCounter = BreadPoints.getCounter();
         sound = Gdx.audio.newSound(Gdx.files.internal("beep.mp3"));
         greyBackgroundSquare = new Texture(Gdx.files.internal("greySquare.png"));
+        bus = new Bus("bus.png", new Vector2(map.getWidth() - 200, map.getHeight() - 250));
 
 
         uiCamera = new OrthographicCamera();
@@ -108,6 +110,7 @@ public class Main extends ApplicationAdapter {
         // Create list of MapEntity to pass to minimap
         mapEntities = new Array<>();
         mapEntities.add(player);
+        mapEntities.add(bus);
 
         // Calculate position values
         int minimapWidth = 400;
@@ -177,6 +180,13 @@ public class Main extends ApplicationAdapter {
                 breadItemArray.removeValue(breadItem, false);
             }
         }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)){
+            if (player.hitbox.overlaps(bus.hitbox) && BreadPoints.getCounter() >= 100){
+                gameOver = true;
+                showGameOverButtons();
+            }
+        }
+
 
         if (System.currentTimeMillis() -Timer.startTime >= 300000){
             gameOver = true;
@@ -334,6 +344,7 @@ public class Main extends ApplicationAdapter {
         displayTime = Timer.refreshTimer();
         pointCounter = BreadPoints.getCounter();
         player.render(batch);
+        bus.render(batch);
         for (Goose goose : gooseArray) {
             goose.render(batch);
         }
@@ -409,7 +420,7 @@ public class Main extends ApplicationAdapter {
         font.draw(
             batch,
             (pointCounter+""),
-            Gdx.graphics.getWidth() - 80,
+            Gdx.graphics.getWidth() - 135,
             Gdx.graphics.getHeight() - 65
         );
 
@@ -521,6 +532,7 @@ public class Main extends ApplicationAdapter {
         sound.dispose();
         Inventory.dispose();
         GameOverScreen.dispose();
+        bus.dispose();
     }
 
     private void addGoose() {
