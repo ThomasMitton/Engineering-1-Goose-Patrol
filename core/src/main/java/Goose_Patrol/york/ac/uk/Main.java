@@ -16,10 +16,17 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import static com.badlogic.gdx.Gdx.app;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
+
+    //Used for swapping between the Main Menu and Game states.
+    public enum GameState {
+        MAIN_MENU,
+        GAME
+    }
+    private GameState currentState = GameState.MAIN_MENU;
     private SpriteBatch batch;
     private Player player;
     private Array<Goose> gooseArray;
@@ -45,6 +52,13 @@ public class Main extends ApplicationAdapter {
     private float duckTimer;
     private ResetGame resetGame;
     private Toaster toaster;
+    private ShapeRenderer shapeRenderer;
+
+    private boolean toastGameActive = false;
+    private float markerPosition = 0;
+    private boolean movingRight = true;
+    private float toasterSpeed = 400f;
+
     private KeyItem keyItem;
     private Stage stage;
 
@@ -57,9 +71,10 @@ public class Main extends ApplicationAdapter {
         toaster = new Toaster("toaster.png", new Vector2(900,300),39, 31);
         keyItem = new KeyItem("key.png", new Vector2(900,600),29, 13);
         batch = new SpriteBatch();
+        shapeRenderer = new ShapeRenderer();
         player = new Player("Player.png", new Vector2(140, 210), 200f, map.getWidth(), map.getHeight());
         wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
-    
+
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
         font = new BitmapFont(Gdx.files.internal("Open Sans.fnt"));
@@ -79,12 +94,12 @@ public class Main extends ApplicationAdapter {
 
 
         health_bar = new HealthBar();
-        
+
         ItemCounter = new ItemCounter(batch);
         GameOver = new GameOver(health_bar);
         resetGame = new ResetGame();
-        
-        
+
+
 
         Inventory = new Inventory();
        
@@ -92,8 +107,15 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void render() {
-        
-        
+
+        if(currentState == GameState.MAIN_MENU) {
+            renderMainMenu();
+            return;
+        }
+
+
+
+
         for (Goose goose : gooseArray) {
             if (player.hitbox.overlaps(goose.hitbox)) {
                 gooseArray.removeValue(goose, false);
@@ -109,8 +131,14 @@ public class Main extends ApplicationAdapter {
             showGameOverButtons();
         }
         if (toaster != null && player.hitbox.overlaps(toaster.hitbox)) {
+            toastGameActive = true;
+
             toaster.dispose();
             toaster=null;
+
+            markerPosition = 0;
+            movingRight = true;
+
             app.log("Collision", "TOASTER");
             //activate minigame
         }
@@ -119,7 +147,7 @@ public class Main extends ApplicationAdapter {
             app.log("Collision", "KEY");
             keyItem.collect(Inventory);
         }
-        
+
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){ // && goose is in range
             BreadPoints.feedGoose();
@@ -129,17 +157,57 @@ public class Main extends ApplicationAdapter {
             app.log("Collision", "WALL");
             wall.checkCollisions(player.pos);
         }
-        
-       
+
+
         ScreenUtils.clear(1f, 1f, 1f, 1f);
-        player.update();
-        for (Goose goose : gooseArray) {
-            goose.update(player.getVector());
+
+        if (!toastGameActive) {
+            player.update();
+            for (Goose goose : gooseArray) {
+                goose.update(player.getVector());
+            }
         }
 
         float delta = Gdx.graphics.getDeltaTime();
         duckTimer += delta;
-        if (duckTimer >1f) {
+
+        if (toastGameActive) {
+
+            if (movingRight) {
+                markerPosition += toasterSpeed * delta;
+
+            }
+            else {
+                markerPosition -= toasterSpeed * delta;
+            }
+
+            if (markerPosition >= 300) {
+                movingRight = false;
+            }
+
+            if (markerPosition <= 0) {
+                movingRight = true;
+            }
+        }
+
+        if (toastGameActive && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+
+            if (markerPosition >= 150 && markerPosition <= 200) {
+                app.log("Toast", "Perfect");
+            }
+
+            else if (markerPosition >= 100 && markerPosition <= 250) {
+                app.log("Toast", "Good");
+            }
+
+            else {
+                app.log("Toast", "Burnt");
+            }
+
+            toastGameActive = false;
+        }
+
+        if (!toastGameActive && duckTimer >1f) {
             duckTimer = 0;
             addGoose();
             app.log("Goose added","big if true");
@@ -173,7 +241,7 @@ public class Main extends ApplicationAdapter {
         for (Goose goose : gooseArray) {
             goose.render(batch);
         }
-        
+
         if (toaster != null) {
             toaster.render(batch);
         }
@@ -183,12 +251,45 @@ public class Main extends ApplicationAdapter {
             keyItem.render(batch);
         }
         wall.render(batch);
-      
+
 
         batch.end();
 
         uiCamera.update();
         batch.setProjectionMatrix(uiCamera.combined);
+
+        if (toastGameActive) {
+            shapeRenderer.setProjectionMatrix(
+                uiCamera.combined
+            );
+
+            shapeRenderer.begin(
+                ShapeRenderer.ShapeType.Filled
+            );
+
+            //RED
+            shapeRenderer.setColor(1, 0, 0, 1);
+            shapeRenderer.rect(500, 500, 100, 30);
+
+            //Yellow
+            shapeRenderer.setColor(1, 1, 0, 1);
+            shapeRenderer.rect(600, 500, 50, 30);
+
+            //Green
+            shapeRenderer.setColor(0, 1, 0, 1);
+            shapeRenderer.rect(650, 500, 50, 30);
+
+            //Yellow
+            shapeRenderer.setColor(1, 1, 0, 1);
+            shapeRenderer.rect(700, 500, 50, 30);
+
+            //RED
+            shapeRenderer.setColor(1, 0, 0, 1);
+            shapeRenderer.rect(750, 500, 100, 30);
+
+            shapeRenderer.end();
+        }
+
 
         batch.begin();
 
@@ -208,6 +309,22 @@ public class Main extends ApplicationAdapter {
             Gdx.graphics.getWidth() - 200,
             Gdx.graphics.getHeight() - 100
         );
+
+        if (toastGameActive) {
+            font.draw(
+                batch, "Toast the bread", 500, 770
+            );
+
+            font.draw(
+                batch, "Press Space", 520, 670
+            );
+
+
+            font.draw(
+                batch, "v", 500 + markerPosition, 560
+            );
+
+        }
 
         batch.end();
 
@@ -233,9 +350,9 @@ public class Main extends ApplicationAdapter {
             GameOverScreen.display();
         }
 
-        
-        
-        
+
+
+
     }
 
     @Override
@@ -244,7 +361,7 @@ public class Main extends ApplicationAdapter {
         GameOverScreen.resize(width,height);
         Inventory.resize(width,height);
     }
-    
+
     public void resetGame() {
         resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, Inventory);
         
@@ -268,6 +385,7 @@ public class Main extends ApplicationAdapter {
     public void dispose() {
         batch.dispose();
         player.dispose();
+        shapeRenderer.dispose();
         for (Goose goose : gooseArray) {
             goose.dispose();
         }
@@ -291,7 +409,25 @@ public class Main extends ApplicationAdapter {
     private void addGoose() {
         gooseArray.add(new Goose("Goose.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight())))));
     }
-    
+
+
+    //Renders the Main Menu Screen (Work in progress).
+    private void renderMainMenu() {
+        com.badlogic.gdx.utils.ScreenUtils.clear(1f,1f,1f,1f);
+
+        uiCamera.update();
+        batch.setProjectionMatrix(uiCamera.combined);
+
+        batch.begin();
+        font.draw(batch, "GOOSE PATROL", 500,2*uiCamera.viewportHeight/3);
+        font.draw(batch, "Click anywhere or press space to play", 500, uiCamera.viewportHeight/2);
+        batch.end();
+
+        if(Gdx.input.isTouched() || Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE)) {
+            currentState = GameState.GAME;
+        }
+    }
+
     public void showGameOverButtons() {
         GameOverScreen.show();
     }
@@ -300,6 +436,8 @@ public class Main extends ApplicationAdapter {
         GameOverScreen.hide();
     }
     
-   
-    
+
+
+
+
 }
