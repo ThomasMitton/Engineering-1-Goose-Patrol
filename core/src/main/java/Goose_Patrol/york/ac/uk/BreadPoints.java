@@ -26,11 +26,6 @@ public class BreadPoints {
     }
 
     public static void resetCounter(){
-        counter = 0;
-    }
-
-    public static void feedGoose(){
-        decrementPoints();
-        //destroy goose
+        counter = 20;
     }
 }

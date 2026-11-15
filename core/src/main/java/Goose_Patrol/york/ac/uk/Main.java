@@ -191,7 +191,13 @@ public class Main extends ApplicationAdapter {
 
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){
-            BreadPoints.feedGoose();
+            for (Goose goose : gooseArray) {
+                boolean destroy = goose.beFed(player.getPos(), BreadPoints.getCounter());
+                if (destroy) {
+                    gooseArray.removeValue(goose, false);
+                    app.log("Collision", "Target Neutralised");
+                }
+            }
         }
 
         if (player.hitbox.overlaps(wall.hitbox)) {
