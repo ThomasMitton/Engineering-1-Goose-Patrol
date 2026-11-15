@@ -16,7 +16,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import static com.badlogic.gdx.Gdx.app;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -83,7 +83,7 @@ public class Main extends ApplicationAdapter {
         wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
 
         camera = new OrthographicCamera();
-        viewport = new FitViewport(800, 450, camera);
+        viewport = new ExtendViewport(800, 450, camera);
         font = new BitmapFont(Gdx.files.internal("Open Sans.fnt"));
         camera.setToOrtho(false, 800, 600);
         font = new BitmapFont(Gdx.files.internal("font2.fnt"));
@@ -146,15 +146,11 @@ public class Main extends ApplicationAdapter {
         }
 
 
-
-
-
-
         for (Goose goose : gooseArray) {
             if (player.hitbox.overlaps(goose.hitbox)) {
                 gooseArray.removeValue(goose, false);
                 mapEntities.removeValue(goose, false);
-                //health_bar.health = health_bar.health - 1;
+                health_bar.health = health_bar.health - 1;
                 if (health_bar.health <=0) {
                     gameOver = true;
                     showGameOverButtons();
