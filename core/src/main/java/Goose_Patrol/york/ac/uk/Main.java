@@ -186,6 +186,7 @@ public class Main extends ApplicationAdapter {
                 boolean destroy = goose.beFed(player.getPos(), BreadPoints.getCounter());
                 if (destroy) {
                     gooseArray.removeValue(goose, false);
+                    mapEntities.removeValue(goose, false);
                     app.log("Collision", "Target Neutralised");
                 }
             }
