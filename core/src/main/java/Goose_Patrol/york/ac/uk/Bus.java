@@ -11,12 +11,10 @@ public class Bus extends Entity implements MapEntity {
         super.hitbox();
     }
 
-    @Override
     public boolean isVisibleOnMap() {
         return true;
     }
 
-    @Override
     public EntityType getEntityType() {
         return EntityType.BUS;
     }

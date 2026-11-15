@@ -19,9 +19,11 @@ public class Minimap {
     private final Texture mapTexture;
     private final Texture playerIcon;
     private final Texture gooseIcon;
+    private final Texture breadIcon;
     private final Texture itemIcon;
     private final Texture busIcon;
     private final Texture portalIcon;
+    private final Texture mapIcon;
     private final Texture otherIcon;
 
 
@@ -91,7 +93,9 @@ public class Minimap {
         gooseIcon = new Texture("EnemyIcon.png");
         itemIcon = new Texture("ItemIcon.png");
         busIcon = new Texture("BusIcon.png");
+        breadIcon = new Texture("BreadIcon.png");
         portalIcon = new Texture("PortalIcon.png");
+        mapIcon = new Texture("MapIcon.png");
         otherIcon = new Texture("GenericIcon.png");
 
     }
@@ -147,13 +151,19 @@ public class Minimap {
                     icon = gooseIcon;
                     break;
                 case BREAD_ITEM:
-                    icon = itemIcon;
+                    icon = breadIcon;
                     break;
                 case BUS:
                     icon = busIcon;
                     break;
                 case PORTAL:
                     icon = portalIcon;
+                    break;
+                case MAP:
+                    icon = mapIcon;
+                    break;
+                case ITEM:
+                    icon = itemIcon;
                     break;
                 case PLAYER:
                     continue; // Don't draw player yet

@@ -126,6 +126,9 @@ public class Main extends ApplicationAdapter {
         mapEntities = new Array<>();
         mapEntities.add(player);
         mapEntities.add(bus);
+        mapEntities.add(portal1);
+        mapEntities.add(portal2);
+        mapEntities.add(keyItem);
 
         // Calculate position values
         int minimapWidth = 400;
@@ -258,6 +261,7 @@ public class Main extends ApplicationAdapter {
         if (!keyItem.collected && player.hitbox.overlaps(keyItem.hitbox)) {
             app.log("Collision", "KEY");
             keyItem.collect(Inventory);
+            mapEntities.removeValue(keyItem, false);
         }
 
 

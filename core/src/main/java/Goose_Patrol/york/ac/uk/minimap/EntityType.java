@@ -4,5 +4,5 @@ package Goose_Patrol.york.ac.uk.minimap;
  * Categorize each entity for use by maps/etc.
  */
 public enum EntityType {
-    PLAYER, GOOSE, BREAD_ITEM, BUS, PORTAL, OTHER
+    PLAYER, GOOSE, BREAD_ITEM, BUS, PORTAL, MAP, ITEM, OTHER
 }

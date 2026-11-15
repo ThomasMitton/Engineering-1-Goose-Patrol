@@ -1,5 +1,7 @@
 package Goose_Patrol.york.ac.uk;
 
+import Goose_Patrol.york.ac.uk.minimap.EntityType;
+import Goose_Patrol.york.ac.uk.minimap.MapEntity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -9,7 +11,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 
 
-public class KeyItem extends Entity{
+public class KeyItem extends Entity implements MapEntity {
 
     private int width;
     private int height;
@@ -38,6 +40,14 @@ public class KeyItem extends Entity{
 
 
 
+    }
+
+    public boolean isVisibleOnMap() {
+        return true;
+    }
+
+    public EntityType getEntityType() {
+        return EntityType.ITEM;
     }
 
 

@@ -21,12 +21,10 @@ public class BreadItem extends Entity implements MapEntity {
         return new Vector2(pos.x, pos.y);
     }
 
-    @Override
     public boolean isVisibleOnMap() {
         return true;
     }
 
-    @Override
     public EntityType getEntityType() {
         return EntityType.BREAD_ITEM;
     }
