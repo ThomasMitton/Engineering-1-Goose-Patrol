@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
 
@@ -25,8 +25,7 @@ public class GameOverScreen {
     public GameOverScreen(Main game) {
         this.game = game;
         //stage setup
-        stage = new Stage(new FitViewport(1600, 900));
-        Gdx.input.setInputProcessor(stage);
+        stage = new Stage(new ScreenViewport());
         //importing skins for buttons ect
         skin = new Skin(Gdx.files.internal("flat-earth-ui.json"));
 
@@ -81,4 +80,13 @@ public class GameOverScreen {
         stage.dispose();
         skin.dispose();
     }
+
+    public void show() {
+        Gdx.input.setInputProcessor(stage);
+    }
+
+    public void hide() {
+        Gdx.input.setInputProcessor(null);
+    }
+
 }

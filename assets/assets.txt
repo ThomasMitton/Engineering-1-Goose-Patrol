@@ -70,5 +70,7 @@ font-export.png
 font-title-export.fnt
 font-title-export.png
 inventory.png
+key.png
 libgdx.png
 map.png
+toaster.png
