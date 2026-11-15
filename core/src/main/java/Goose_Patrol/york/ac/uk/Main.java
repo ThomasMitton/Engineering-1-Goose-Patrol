@@ -224,15 +224,17 @@ public class Main extends ApplicationAdapter {
         if (keyItem.collected) {
             if (player.hitbox.overlaps(portal1.hitbox)) {
                 player.pos = new Vector2(portal2.pos.x + 100, portal2.pos.y);
+                ItemCounter.incrementEvents();
             }
             if (player.hitbox.overlaps(portal2.hitbox)) {
                 player.pos = new Vector2(portal1.pos.x + 100, portal1.pos.y);
+                ItemCounter.incrementEvents();
             }
         }
         if (toaster != null && player.hitbox.overlaps(toaster.hitbox)) {
             toastGameActive = true;
 
-            ItemCounter.EventsActivated++;
+            ItemCounter.incrementEvents();
 
             toaster.dispose();
             toaster = null;
@@ -256,6 +258,7 @@ public class Main extends ApplicationAdapter {
                 if (destroy) {
                     gooseArray.removeValue(goose, false);
                     mapEntities.removeValue(goose, false);
+                    ItemCounter.incrementItems();
                     app.log("Collision", "Target Neutralised");
                 }
             }
@@ -327,19 +330,6 @@ public class Main extends ApplicationAdapter {
                 39,
                 31
             );
-        }
-
-        if (toastGameActive && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-
-            if (markerPosition >= 150 && markerPosition <= 200) {
-                app.log("Toast", "Perfect");
-            } else if (markerPosition >= 100 && markerPosition <= 250) {
-                app.log("Toast", "Good");
-            } else {
-                app.log("Toast", "Burnt");
-            }
-
-            toastGameActive = false;
         }
 
         if (!toastGameActive && duckTimer > 1f) {
