@@ -11,6 +11,7 @@ Wall.png
 beep.mp3
 bread.png
 bread_inactive.png
+bus.png
 flat-earth-ui.atlas
 flat-earth-ui.json
 flat-earth-ui.png
@@ -76,6 +77,8 @@ font-title-export.png
 font2.fnt
 font2.png
 greySquare.png
+hs_err_pid70658.log
+hs_err_pid70686.log
 inventory.png
 key.png
 libgdx.png

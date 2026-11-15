@@ -17,8 +17,7 @@ public class BreadItem extends Entity implements MapEntity {
         this.dispose();
     }
 
-    @Override
-    public Vector2 getPos() {
+    public Vector2 getPosition() {
         return new Vector2(pos.x, pos.y);
     }
 
