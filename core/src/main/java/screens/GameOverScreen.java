@@ -1,7 +1,9 @@
 package screens;
+import Goose_Patrol.york.ac.uk.GoosePatrol;
 import Goose_Patrol.york.ac.uk.ResetGame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -9,23 +11,27 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
 
-public class GameOverScreen implements Screen {
+public class GameOverScreen extends ScreenAdapter {
 
+    private GoosePatrol game;
     private Stage stage;
     private Skin skin;
     private OrthographicCamera uiCamera;
     public ResetGame resetGame;
-    private GameScreen game;
 
 
 
 
-    public GameOverScreen(GameScreen game) {
+    public GameOverScreen(GoosePatrol game) {
         this.game = game;
+    }
+
+    public void show() {
         //stage setup
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
@@ -44,8 +50,9 @@ public class GameOverScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 //add restarting the game
-                game.resetGame();
-            }
+                game.setScreen(new MainMenu(game));
+                dispose();
+                }
         });
 
         // quit button
@@ -67,45 +74,27 @@ public class GameOverScreen implements Screen {
         stage.addActor(GameOver_button);
     }
 
-    public void display() {
+    public void render(float delta) {
         //clears the stage to put up new stage
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        stage.act(Gdx.graphics.getDeltaTime());
+        game.batch.begin();
+        stage.act(delta);
         stage.draw();
-    }
-
-    @Override
-    public void show() {
-
-    }
-
-    @Override
-    public void render(float delta) {
-
+        game.batch.end();
     }
 
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
     }
 
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
+    public void dispose() {
+        stage.dispose();
+        skin.dispose();
     }
 
     @Override
     public void hide() {
-
-    }
-
-    public void dispose() {
-        stage.dispose();
-        skin.dispose();
+        Gdx.input.setInputProcessor(null);
     }
 }

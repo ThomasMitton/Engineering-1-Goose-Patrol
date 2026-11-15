@@ -2,15 +2,15 @@ package screens;
 
 import Goose_Patrol.york.ac.uk.GoosePatrol;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-public class MainMenu extends GeneralScreen {
-    private Texture startMenu;
+public class MainMenu extends ScreenAdapter {
     private GoosePatrol game;
+    private Texture startMenu;
 
-    public MainMenu(final GoosePatrol game) {
-        super(game);
+    public MainMenu(GoosePatrol game) {
         this.game = game;
     }
 

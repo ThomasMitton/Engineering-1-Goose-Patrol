@@ -3,6 +3,7 @@ package screens;
 import Goose_Patrol.york.ac.uk.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -16,7 +17,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import static com.badlogic.gdx.Gdx.app;
 
-public class GameScreen extends GeneralScreen {
+public class GameScreen extends ScreenAdapter {
     private GoosePatrol game;
     private Player player;
     private Array<Goose> gooseArray;
@@ -32,7 +33,6 @@ public class GameScreen extends GeneralScreen {
     public static BreadPoints staticBreadPoints;
     private int pointCounter;
     public Sound sound;
-    private GameOverScreen GameOverScreen;
     private boolean gameOver = false;
     private ItemCounter ItemCounter;
     private GameOver GameOver;
@@ -44,10 +44,11 @@ public class GameScreen extends GeneralScreen {
     private Toaster toaster;
 
     public GameScreen(GoosePatrol game) {
-        super(game);
         this.game = game;
+    }
 
-        GameOverScreen = new GameOverScreen(this);
+    @Override
+    public void show() {
         map = new Texture(Gdx.files.internal("map.png"));
         gooseArray = new Array<>();
         toaster = new Toaster("toaster.png", new Vector2(900,300),39, 31);
@@ -84,12 +85,17 @@ public class GameScreen extends GeneralScreen {
         image1.setSize(127, 63);
         image1.setPosition(((float) Gdx.graphics.getWidth() / 2) - 64, 10);
         inventory.addActor(image1);
+
     }
 
     @Override
     public void render(float delta) {
         logic();
         draw();
+        if(gameOver) {
+            game.setScreen(new GameOverScreen(game));
+            dispose();
+        }
     }
 
     private void logic() {
@@ -210,15 +216,11 @@ public class GameScreen extends GeneralScreen {
         inventory.draw();
 
         game.batch.end();
-        if(gameOver) {
-            GameOverScreen.display();
-        }
     }
 
     @Override
     public void resize(int width, int height) {
         uiCamera.setToOrtho(false, width, height);
-        GameOverScreen.resize(width,height);
     }
 
     public void resetGame() {
@@ -251,7 +253,6 @@ public class GameScreen extends GeneralScreen {
         ItemCounter.dispose();
         inventory.dispose();
         inventoryImage.dispose();
-        GameOverScreen.dispose();
     }
 
     private void addGoose() {
