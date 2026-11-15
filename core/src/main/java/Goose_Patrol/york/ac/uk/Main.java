@@ -89,7 +89,7 @@ public class Main extends ApplicationAdapter {
             Gdx.graphics.getHeight()
         );
 
-        
+
 
 
 
@@ -102,7 +102,7 @@ public class Main extends ApplicationAdapter {
 
 
         Inventory = new Inventory();
-       
+
     }
 
     @Override
@@ -142,7 +142,7 @@ public class Main extends ApplicationAdapter {
             app.log("Collision", "TOASTER");
             //activate minigame
         }
-        
+
         if (keyItem.collected == false && player.hitbox.overlaps(keyItem.hitbox)) {
             app.log("Collision", "KEY");
             keyItem.collect(Inventory);
@@ -234,7 +234,7 @@ public class Main extends ApplicationAdapter {
 
         batch.begin();
 
-        batch.draw(map, 0, 0, 2270, 1182);
+        batch.draw(map, 0, 0, 1904, 1964);
         displayTime = Timer.refreshTimer();
         pointCounter = BreadPoints.getCounter();
         player.render(batch);
@@ -245,8 +245,8 @@ public class Main extends ApplicationAdapter {
         if (toaster != null) {
             toaster.render(batch);
         }
-        
-        
+
+
         if (keyItem != null && keyItem.collected == false) {
             keyItem.render(batch);
         }
@@ -329,23 +329,23 @@ public class Main extends ApplicationAdapter {
         batch.end();
 
         health_bar.display();
-        
+
 
         batch.begin();
-       
+
 
         ItemCounter.display();
-        
-        batch.end();
-            
-      
-        
-        Inventory.draw();
-        
-        
 
-    
-        
+        batch.end();
+
+
+
+        Inventory.draw();
+
+
+
+
+
         if(gameOver) {
             GameOverScreen.display();
         }
@@ -364,21 +364,21 @@ public class Main extends ApplicationAdapter {
 
     public void resetGame() {
         resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, Inventory);
-        
+
         if (toaster != null) {
             toaster.dispose();
         }
         toaster = new Toaster("toaster.png", new Vector2(900,300), 39,31);
-        
+
         if (keyItem != null) {
             keyItem.dispose();
         }
-        
+
         keyItem = new KeyItem("key.png", new Vector2(900,600),29, 13);
         hideGameOverButtons();
         gameOver = false;
-        
-         
+
+
      }
 
     @Override
@@ -392,7 +392,7 @@ public class Main extends ApplicationAdapter {
         if (toaster != null) {
             toaster.dispose();
         }
-        
+
         if (keyItem != null) {
             keyItem.dispose();
         }
@@ -431,11 +431,11 @@ public class Main extends ApplicationAdapter {
     public void showGameOverButtons() {
         GameOverScreen.show();
     }
-    
+
     public void hideGameOverButtons() {
         GameOverScreen.hide();
     }
-    
+
 
 
 
