@@ -101,7 +101,7 @@ public class Minimap {
         // Determine player position from list of entities passed
         Vector2 position = Vector2.Zero;
         if (mapPlayer != null) {
-            position = mapPlayer.getPosition();
+            position = mapPlayer.getPos();
         }
 
         // Set and clamp camera position
@@ -147,7 +147,7 @@ public class Minimap {
             }
 
             // Draw the entity icon
-            Vector2 entityPos = entity.getPosition();
+            Vector2 entityPos = entity.getPos();
             batch.draw(
                 icon, entityPos.x - icon.getWidth()/2f,
                 entityPos.y - icon.getHeight()/2f
@@ -155,7 +155,7 @@ public class Minimap {
         }
 
         // Draw player icon last so always on top of the minimap
-        Vector2 playerPos = mapPlayer.getPosition();
+        Vector2 playerPos = mapPlayer.getPos();
         batch.draw(playerIcon, playerPos.x - playerIcon.getWidth()/2f,
             playerPos.y - playerIcon.getHeight()/2f
         );

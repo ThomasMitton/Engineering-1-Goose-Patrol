@@ -37,8 +37,6 @@ public class Goose extends Entity implements MapEntity {
         float gooseX = pos.x;
         float gooseY = pos.y;
 
-        System.out.println("playerX: " + playerX + " playerY: " + playerY);
-        System.out.println("gooseX: " + gooseX + " gooseY: " + gooseY);
 
         if ((gooseX - playerX < 100 && gooseY - playerY < 100) && (gooseX - playerX > -110 && gooseY - playerY > -100)) {
             if (pointValue > 0) {
@@ -51,10 +49,6 @@ public class Goose extends Entity implements MapEntity {
     }
 
     // --- MapEntity implementation ---
-    public Vector2 getPosition() {
-        return super.getVector();
-    }
-
     public EntityType getEntityType() {
         return EntityType.GOOSE;
     }
