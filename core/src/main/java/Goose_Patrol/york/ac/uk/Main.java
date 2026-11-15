@@ -74,6 +74,9 @@ public class Main extends ApplicationAdapter {
 
     private BreadIcon breadIcon;
 
+    private boolean gamePaused;
+    private Texture pauseMenu;
+
     @Override
     public void create() {
         GameOverScreen = new GameOverScreen(this);
@@ -87,6 +90,7 @@ public class Main extends ApplicationAdapter {
         player = new Player("Player.png", new Vector2(140, 210), 200f, map.getWidth(), map.getHeight());
         wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
         titleScreen = new Texture("TitleScreen.png");
+        pauseMenu = new Texture("PauseMenu.png");
         camera = new OrthographicCamera();
         viewport = new ExtendViewport(800, 450, camera);
         font = new BitmapFont(Gdx.files.internal("Open Sans.fnt"));
@@ -150,6 +154,11 @@ public class Main extends ApplicationAdapter {
 
         if (currentState == GameState.MAIN_MENU) {
             renderMainMenu();
+            return;
+        }
+
+        if (gamePaused) {
+            renderPauseMenu();
             return;
         }
 
@@ -236,12 +245,16 @@ public class Main extends ApplicationAdapter {
 
         ScreenUtils.clear(1f, 1f, 1f, 1f);
 
-        if (!toastGameActive) {
+        if (!toastGameActive && !gamePaused) {
             player.update();
             for (Goose goose : gooseArray) {
                 goose.update(player.getPos());
             }
         }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            gamePaused = !gamePaused;
+        };
 
         float delta = Gdx.graphics.getDeltaTime();
         duckTimer += delta;
@@ -339,7 +352,9 @@ public class Main extends ApplicationAdapter {
         batch.begin();
 
         batch.draw(map, 0, 0, 1904, 1964);
-        displayTime = Timer.refreshTimer();
+        if (!gamePaused) {
+            displayTime = Timer.refreshTimer();
+        };
         pointCounter = BreadPoints.getCounter();
         player.render(batch);
         for (Goose goose : gooseArray) {
@@ -405,7 +420,10 @@ public class Main extends ApplicationAdapter {
 
         batch.begin();
 
-        displayTime = Timer.refreshTimer();
+        if (!gamePaused) {
+            displayTime = Timer.refreshTimer();
+        };
+
         pointCounter = BreadPoints.getCounter();
 
         batch.draw(greyBackgroundSquare, Gdx.graphics.getWidth()-140, Gdx.graphics.getHeight()-115);
@@ -564,6 +582,20 @@ public class Main extends ApplicationAdapter {
 
         if(Gdx.input.isTouched() || Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE)) {
             currentState = GameState.GAME;
+        }
+    }
+
+    private void renderPauseMenu() {
+        com.badlogic.gdx.utils.ScreenUtils.clear(1f,1f,1f,1f);
+
+        viewport.apply();
+        batch.setProjectionMatrix(uiCamera.combined);
+        batch.begin();
+        batch.draw(pauseMenu,0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.end();
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            gamePaused = false;
         }
     }
 

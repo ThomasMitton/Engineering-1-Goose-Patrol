@@ -18,11 +18,6 @@ public class BreadItem extends Entity implements MapEntity {
     }
 
     @Override
-    public Vector2 getPosition() {
-        return new Vector2(pos.x, pos.y);
-    }
-
-    @Override
     public boolean isVisibleOnMap() {
         return true;
     }
