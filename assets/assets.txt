@@ -78,4 +78,5 @@ inventory.png
 key.png
 libgdx.png
 map.png
+portal.png
 toaster.png

@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 
 public class KeyItem extends Entity{
-   
+
     private int width;
     private int height;
     private Texture keyImage;
@@ -23,31 +23,28 @@ public class KeyItem extends Entity{
         this.width = width;
         this.height = height;
         super.hitbox();
+        this.collected = false;
     }
-    
+
     public void collect(Inventory Inventory){
         if (collected) return;
-        collected = true;
-        
-        
+        this.collected = true;
+
+
         keyImage = new Texture(Gdx.files.internal("key.png"));
         image2 = new Image(keyImage);
         image2.setSize(80, 80);
         Inventory.addKey(image2);
-        
-       
-        
+
+
+
     }
-    
-    public void use(){
-        //locks the pen when in use
-    }
-    
+
 
     public void dispose() {
         super.dispose();
     }
 }
 
-    
+
 

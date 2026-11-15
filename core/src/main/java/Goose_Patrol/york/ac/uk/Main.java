@@ -39,6 +39,8 @@ public class Main extends ApplicationAdapter {
     private String myText;
     private Timer timer;
     private String displayTime;
+    private Portal portal1;
+    private Portal portal2;
     private HealthBar health_bar;
     public BreadPoints breadPoints;
     public static BreadPoints staticBreadPoints;
@@ -91,7 +93,10 @@ public class Main extends ApplicationAdapter {
         pointCounter = BreadPoints.getCounter();
         sound = Gdx.audio.newSound(Gdx.files.internal("beep.mp3"));
         greyBackgroundSquare = new Texture(Gdx.files.internal("greySquare.png"));
-
+        portal1 = new Portal("portal.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight()))));
+        portal2 = new Portal("portal.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight()))));
+        app.log("Portal1 pos",portal1.pos+"");
+        app.log("Portal2 pos",portal2.pos+"");
 
         uiCamera = new OrthographicCamera();
         uiCamera.setToOrtho(
@@ -140,7 +145,7 @@ public class Main extends ApplicationAdapter {
     public void render() {
 
 
-        if(currentState == GameState.MAIN_MENU) {
+        if (currentState == GameState.MAIN_MENU) {
             renderMainMenu();
             return;
         }
@@ -151,24 +156,31 @@ public class Main extends ApplicationAdapter {
                 gooseArray.removeValue(goose, false);
                 mapEntities.removeValue(goose, false);
                 health_bar.health = health_bar.health - 1;
-                if (health_bar.health <=0) {
+                if (health_bar.health <= 0) {
                     gameOver = true;
                     showGameOverButtons();
                 }
             }
         }
-        if (System.currentTimeMillis() -Timer.startTime >= 300000){
+        if (System.currentTimeMillis() - Timer.startTime >= 300000) {
             gameOver = true;
             showGameOverButtons();
         }
-
+        if (keyItem.collected) {
+            if (player.hitbox.overlaps(portal1.hitbox)) {
+                player.pos = new Vector2(portal2.pos.x + 100, portal2.pos.y);
+            }
+            if (player.hitbox.overlaps(portal2.hitbox)) {
+                player.pos = new Vector2(portal1.pos.x + 100, portal1.pos.y);
+            }
+        }
         if (toaster != null && player.hitbox.overlaps(toaster.hitbox)) {
             toastGameActive = true;
 
             ItemCounter.EventsActivated++;
 
             toaster.dispose();
-            toaster=null;
+            toaster = null;
 
             markerPosition = 0;
             movingRight = true;
@@ -183,7 +195,7 @@ public class Main extends ApplicationAdapter {
         }
 
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
             for (Goose goose : gooseArray) {
                 boolean destroy = goose.beFed(player.getPos(), BreadPoints.getCounter());
                 if (destroy) {
@@ -217,8 +229,7 @@ public class Main extends ApplicationAdapter {
             if (movingRight) {
                 markerPosition += toasterSpeed * delta;
 
-            }
-            else {
+            } else {
                 markerPosition -= toasterSpeed * delta;
             }
 
@@ -267,36 +278,32 @@ public class Main extends ApplicationAdapter {
 
             if (markerPosition >= 150 && markerPosition <= 200) {
                 app.log("Toast", "Perfect");
-            }
-
-            else if (markerPosition >= 100 && markerPosition <= 250) {
+            } else if (markerPosition >= 100 && markerPosition <= 250) {
                 app.log("Toast", "Good");
-            }
-
-            else {
+            } else {
                 app.log("Toast", "Burnt");
             }
 
             toastGameActive = false;
         }
 
-        if (!toastGameActive && duckTimer >1f) {
+        if (!toastGameActive && duckTimer > 1f) {
             duckTimer = 0;
             addGoose();
-            app.log("Goose added","big if true");
+            app.log("Goose added", "big if true");
         }
 
         camera.position.set(
             MathUtils.clamp(MathUtils.clamp(
                 camera.position.x,
-                player.getPos().x - (camera.viewportWidth / 3) + player.texture.getWidth(),
-                player.getPos().x + (camera.viewportWidth / 3)
+                player.getPos().x - (camera.viewportWidth / 10) + player.texture.getWidth(),
+                player.getPos().x + (camera.viewportWidth / 10)
             ), camera.viewportWidth / 2, map.getWidth() - camera.viewportWidth / 2),
 
             MathUtils.clamp(MathUtils.clamp(
                 camera.position.y,
-                player.getPos().y - (camera.viewportHeight / 3) + player.texture.getHeight(),
-                player.getPos().y + (camera.viewportHeight / 3)
+                player.getPos().y - (camera.viewportHeight / 10) + player.texture.getHeight(),
+                player.getPos().y + (camera.viewportHeight / 10)
             ), camera.viewportHeight / 2, map.getHeight() - camera.viewportHeight / 2),
             0
         );
@@ -325,7 +332,10 @@ public class Main extends ApplicationAdapter {
         }
         wall.render(batch);
 
-
+        if (keyItem.collected) {
+        portal1.render(batch);
+        portal2.render(batch);
+    }
         batch.end();
 
 
@@ -471,6 +481,8 @@ public class Main extends ApplicationAdapter {
     public void dispose() {
         batch.dispose();
         player.dispose();
+        portal1.dispose();
+        portal2.dispose();
         shapeRenderer.dispose();
         for (Goose goose : gooseArray) {
             goose.dispose();
