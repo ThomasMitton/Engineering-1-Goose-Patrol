@@ -273,10 +273,10 @@ public class Main extends ApplicationAdapter {
             }
         }
 
-        if (player.hitbox.overlaps(wall.hitbox)) {
-            app.log("Collision", "WALL");
-            wall.checkCollisions(player.pos);
-        }
+//        if (player.hitbox.overlaps(wall.hitbox)) {
+//            app.log("Collision", "WALL");
+//            wall.checkCollisions(player.pos);
+//        }
 
 
         ScreenUtils.clear(1f, 1f, 1f, 1f);
@@ -397,7 +397,7 @@ public class Main extends ApplicationAdapter {
         if (keyItem != null && !keyItem.collected) {
             keyItem.render(batch);
         }
-        wall.render(batch);
+//        wall.render(batch);
 
         if (keyItem.collected) {
         portal1.render(batch);
