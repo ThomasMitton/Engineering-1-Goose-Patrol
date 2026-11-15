@@ -300,7 +300,7 @@ public class Main extends ApplicationAdapter {
 
         if (toastGameActive) {
             font.draw(
-                batch, "Toast the bread", 500, 870
+                batch, "Toast the bread", 500, 770
             );
 
             font.draw(
