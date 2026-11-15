@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Array;
 public class ResetGame {
         
     
-    public void reset(Player player, HealthBar health, Array<Goose> gooseArray, ItemCounter itemCounter ,BreadPoints breadPoints, Stage inventory, Texture inventoryImage) {
+    public void reset(Player player, HealthBar health, Array<Goose> gooseArray, ItemCounter itemCounter ,BreadPoints breadPoints, Inventory Inventory) {
         player.pos.set(140,210);
         
         health.health = 100;
@@ -20,13 +20,17 @@ public class ResetGame {
         
         BreadPoints.resetCounter();
         
-        itemCounter.reset();
         
-        inventory.clear();
-        Image image1 = new Image(inventoryImage);
-        image1.setSize(127,63);
-        image1.setPosition(((float)Gdx.graphics.getWidth()/2)-64,10);
-        inventory.addActor(image1);
+        //EventCounter.reset();
+        
+        //inventory.clear();
+        //Image image1 = new Image(inventoryImage);
+        //image1.setSize(127,63);
+        //image1.setPosition(((float)Gdx.graphics.getWidth()/2)-64,10);
+        //inventory.addActor(image1);
+        Inventory.reset();
+        
+        itemCounter.reset();
         
     }
     

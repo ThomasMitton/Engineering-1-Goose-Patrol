@@ -6,7 +6,7 @@ public class HealthBar {
     
     private ShapeRenderer bar_health;
     
-    public float health = 1;
+    public float health = 10;
     private float health_max = 100;
     
     public float getHealth() {

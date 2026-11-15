@@ -74,6 +74,7 @@ greySquare.png
 hs_err_pid70658.log
 hs_err_pid70686.log
 inventory.png
+key.png
 libgdx.png
 map.png
 toaster.png
