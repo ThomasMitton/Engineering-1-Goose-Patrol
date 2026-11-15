@@ -24,6 +24,7 @@ public class GameScreen extends ScreenAdapter {
     private Texture map;
     private OrthographicCamera camera;
     private OrthographicCamera uiCamera;
+    private Viewport viewport;
     private BitmapFont font;
     private String myText;
     private Timer timer;
@@ -43,6 +44,9 @@ public class GameScreen extends ScreenAdapter {
     private ResetGame resetGame;
     private Toaster toaster;
 
+    private Minimap minimap;
+    private Array<MapEntity> mapEntities;
+
     public GameScreen(GoosePatrol game) {
         this.game = game;
     }
@@ -56,7 +60,7 @@ public class GameScreen extends ScreenAdapter {
         wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
 
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 600);
+        viewport = new FitViewport(800, 450, camera);
         font = new BitmapFont(Gdx.files.internal("Open Sans.fnt"));
         displayTime = Timer.refreshTimer();
         pointCounter = BreadPoints.getCounter();
@@ -72,6 +76,26 @@ public class GameScreen extends ScreenAdapter {
         map = new Texture(Gdx.files.internal("map.png"));
 
         healthBar = new HealthBar();
+        // --- Create minimap ---
+        // Create list of MapEntity to pass to minimap
+        mapEntities = new Array<>();
+        mapEntities.add(player);
+
+        // Calculate position values
+        int minimapWidth = 400;
+        int minimapHeight = 400;
+        int margin = 10;
+        int minimapPosX = Gdx.graphics.getWidth() - minimapWidth - margin;
+
+        minimap = new Minimap(
+            map, mapEntities,
+            minimapWidth, minimapHeight,
+            minimapPosX, margin,
+            800, 800,
+            map.getWidth(), map.getHeight(),
+            1f
+        );
+
 
         ItemCounter = new ItemCounter(game.batch);
         GameOver = new GameOver(healthBar);
@@ -107,6 +131,7 @@ public class GameScreen extends ScreenAdapter {
             if (player.hitbox.overlaps(goose.hitbox)) { // Checks if goose collides with player
                 goose.dispose();
                 gooseArray.removeValue(goose, false); // Deletes goose if goose hits player
+                mapEntities.removeValue(goose, false);
                 app.log("Collision", "GOOSE");
                 healthBar.health = healthBar.health - 1;
                 if (healthBar.health <= 0) {
@@ -133,6 +158,12 @@ public class GameScreen extends ScreenAdapter {
             }
         }
 
+
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){ // && goose is in range
+            BreadPoints.feedGoose();
+        }
+
         if (player.hitbox.overlaps(wall.hitbox)) {
             app.log("Collision", "WALL");
             wall.checkCollisions(player.pos);
@@ -149,6 +180,10 @@ public class GameScreen extends ScreenAdapter {
             addGoose();
             app.log("Goose added", "big if true");
         }
+
+        minimap.update();
+        minimap.render(batch);
+        viewport.apply();
     }
 
         private void draw() {
@@ -188,6 +223,7 @@ public class GameScreen extends ScreenAdapter {
         }
         wall.render(game.batch);
 
+
         uiCamera.update();
         game.batch.setProjectionMatrix(uiCamera.combined);
 
@@ -221,18 +257,18 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void resize(int width, int height) {
         uiCamera.setToOrtho(false, width, height);
+        viewport.update(width, height, true);
+        GameOverScreen.resize(width,height);
+
+        // --- Handle minimap resize ---
+        // Calculate position values
+        int minimapWidth = width/5;
+        int minimapHeight = minimapWidth; // Guarantees square shape, change wanting to mirror window aspect ratio
+        int margin = 10;
+        int minimapPosX = width - minimapWidth - margin;
+        minimap.resize(minimapWidth, minimapHeight);
+        minimap.setPos(minimapPosX, margin);
     }
-
-    public void resetGame() {
-        resetGame.reset(player, healthBar,  gooseArray, ItemCounter ,breadPoints, inventory, inventoryImage);
-
-        if (toaster != null) {
-            toaster.dispose();
-        }
-        toaster = new Toaster("toaster.png", new Vector2(900,300), 39,31);
-        gameOver = false;
-
-     }
 
     @Override
     public void dispose() {
@@ -245,6 +281,7 @@ public class GameScreen extends ScreenAdapter {
             toaster.dispose();
         }
         map.dispose();
+        minimap.dispose();
         wall.dispose();
         font.dispose();
         healthBar.dispose();
@@ -256,6 +293,8 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void addGoose() {
-        gooseArray.add(new Goose("Goose.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight())))));
+        Goose newGoose = new Goose("Goose.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight()))));
+        gooseArray.add(newGoose);
+        mapEntities.add(newGoose);
     }
 }
