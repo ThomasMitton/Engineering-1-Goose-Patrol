@@ -17,6 +17,7 @@ import static com.badlogic.gdx.Gdx.app;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
@@ -39,12 +40,13 @@ public class Main extends ApplicationAdapter {
 
     private ItemCounter ItemCounter;
     private GameOver GameOver;
-    private Stage inventory;
-    private Texture inventoryImage;
+    private Inventory Inventory;
     private Wall wall;
     private float duckTimer;
     private ResetGame resetGame;
     private Toaster toaster;
+    private KeyItem keyItem;
+    private Stage stage;
 
 
     @Override
@@ -53,6 +55,7 @@ public class Main extends ApplicationAdapter {
         map = new Texture(Gdx.files.internal("map.png"));
         gooseArray = new Array<>();
         toaster = new Toaster("toaster.png", new Vector2(900,300),39, 31);
+        keyItem = new KeyItem("key.png", new Vector2(900,600),29, 13);
         batch = new SpriteBatch();
         player = new Player("Player.png", new Vector2(140, 210), 200f, map.getWidth(), map.getHeight());
         wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
@@ -71,7 +74,7 @@ public class Main extends ApplicationAdapter {
             Gdx.graphics.getHeight()
         );
 
-        map = new Texture(Gdx.files.internal("map.png"));
+        
 
 
 
@@ -83,12 +86,8 @@ public class Main extends ApplicationAdapter {
         
         
 
-        inventory = new Stage(new ScreenViewport());
-        inventoryImage = new Texture(Gdx.files.internal("inventory.png"));
-        Image image1 = new Image(inventoryImage);
-        image1.setSize(127, 63);
-        image1.setPosition(((float) Gdx.graphics.getWidth() / 2) - 64, 10);
-        inventory.addActor(image1);
+        Inventory = new Inventory();
+       
     }
 
     @Override
@@ -98,18 +97,27 @@ public class Main extends ApplicationAdapter {
         for (Goose goose : gooseArray) {
             if (player.hitbox.overlaps(goose.hitbox)) {
                 gooseArray.removeValue(goose, false);
-                health_bar.health = health_bar.health - 1;
+                //health_bar.health = health_bar.health - 1;
                 if (health_bar.health <=0) {
                     gameOver = true;
+                    showGameOverButtons();
                 }
             }
         }
-        
+        if (System.currentTimeMillis() -Timer.startTime >= 300000){
+            gameOver = true;
+            showGameOverButtons();
+        }
         if (toaster != null && player.hitbox.overlaps(toaster.hitbox)) {
             toaster.dispose();
             toaster=null;
             app.log("Collision", "TOASTER");
-            //actiave minigame
+            //activate minigame
+        }
+        
+        if (keyItem.collected == false && player.hitbox.overlaps(keyItem.hitbox)) {
+            app.log("Collision", "KEY");
+            keyItem.collect(Inventory);
         }
         
 
@@ -169,6 +177,11 @@ public class Main extends ApplicationAdapter {
         if (toaster != null) {
             toaster.render(batch);
         }
+        
+        
+        if (keyItem != null && keyItem.collected == false) {
+            keyItem.render(batch);
+        }
         wall.render(batch);
       
 
@@ -199,19 +212,23 @@ public class Main extends ApplicationAdapter {
         batch.end();
 
         health_bar.display();
+        
 
         batch.begin();
-
-        ItemCounter.display();
-
-        inventory.act();
-        inventory.draw();
-
-
-
        
 
+        ItemCounter.display();
+        
         batch.end();
+            
+      
+        
+        Inventory.draw();
+        
+        
+
+    
+        
         if(gameOver) {
             GameOverScreen.display();
         }
@@ -225,16 +242,25 @@ public class Main extends ApplicationAdapter {
     public void resize(int width, int height) {
         uiCamera.setToOrtho(false, width, height);
         GameOverScreen.resize(width,height);
+        Inventory.resize(width,height);
     }
     
     public void resetGame() {
-        resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, inventory, inventoryImage);
+        resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, Inventory);
         
         if (toaster != null) {
             toaster.dispose();
         }
         toaster = new Toaster("toaster.png", new Vector2(900,300), 39,31);
+        
+        if (keyItem != null) {
+            keyItem.dispose();
+        }
+        
+        keyItem = new KeyItem("key.png", new Vector2(900,600),29, 13);
+        hideGameOverButtons();
         gameOver = false;
+        
          
      }
 
@@ -248,15 +274,17 @@ public class Main extends ApplicationAdapter {
         if (toaster != null) {
             toaster.dispose();
         }
+        
+        if (keyItem != null) {
+            keyItem.dispose();
+        }
         map.dispose();
         wall.dispose();
         font.dispose();
         health_bar.dispose();
         ItemCounter.dispose();
         sound.dispose();
-        ItemCounter.dispose();
-        inventory.dispose();
-        inventoryImage.dispose();
+        Inventory.dispose();
         GameOverScreen.dispose();
     }
 
@@ -264,6 +292,14 @@ public class Main extends ApplicationAdapter {
         gooseArray.add(new Goose("Goose.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight())))));
     }
     
+    public void showGameOverButtons() {
+        GameOverScreen.show();
+    }
     
+    public void hideGameOverButtons() {
+        GameOverScreen.hide();
+    }
+    
+   
     
 }
