@@ -54,7 +54,6 @@ public class Inventory {
         layout();
     }
 
-
     public void reset() {
         inventory.clear();
         createInv();

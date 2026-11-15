@@ -69,6 +69,7 @@ public class Main extends ApplicationAdapter {
     private Minimap minimap;
     private Array<MapEntity> mapEntities;
 
+    private BreadIcon breadIcon;
 
     @Override
     public void create() {
@@ -129,7 +130,7 @@ public class Main extends ApplicationAdapter {
         GameOver = new GameOver(health_bar);
         resetGame = new ResetGame();
 
-
+        breadIcon = new BreadIcon((float) Gdx.graphics.getWidth() / 2 - 54, 30, 54, 28);
 
         Inventory = new Inventory();
 
@@ -421,6 +422,7 @@ public class Main extends ApplicationAdapter {
         viewport.apply();
 
         Inventory.draw();
+        breadIcon.render(batch, uiCamera.combined);
 
         if(gameOver) {
             GameOverScreen.display();
@@ -435,6 +437,7 @@ public class Main extends ApplicationAdapter {
         viewport.update(width, height, true);
         GameOverScreen.resize(width,height);
         Inventory.resize(width,height);
+        breadIcon.setPosition(width / 2f - 57, 28);
 
         // --- Handle minimap resize ---
         // Calculate position values
@@ -491,6 +494,7 @@ public class Main extends ApplicationAdapter {
         sound.dispose();
         Inventory.dispose();
         GameOverScreen.dispose();
+        breadIcon.dispose();
     }
 
     private void addGoose() {
