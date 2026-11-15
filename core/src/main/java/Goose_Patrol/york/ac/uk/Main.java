@@ -1,4 +1,6 @@
 package Goose_Patrol.york.ac.uk;
+import Goose_Patrol.york.ac.uk.minimap.MapEntity;
+import Goose_Patrol.york.ac.uk.minimap.Minimap;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -17,8 +19,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import static com.badlogic.gdx.Gdx.app;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
@@ -35,6 +39,7 @@ public class Main extends ApplicationAdapter {
     private Texture map;
     private OrthographicCamera camera;
     private OrthographicCamera uiCamera;
+    private Viewport viewport;
     private BitmapFont font;
     private String myText;
     private Timer timer;
@@ -66,6 +71,9 @@ public class Main extends ApplicationAdapter {
     private KeyItem keyItem;
     private Stage stage;
 
+    private Minimap minimap;
+    private Array<MapEntity> mapEntities;
+
 
     @Override
     public void create() {
@@ -80,6 +88,8 @@ public class Main extends ApplicationAdapter {
         wall = new Wall("Wall.png", new Vector2(300, 300), 100, 200);
 
         camera = new OrthographicCamera();
+        viewport = new FitViewport(800, 450, camera);
+        font = new BitmapFont(Gdx.files.internal("Open Sans.fnt"));
         camera.setToOrtho(false, 800, 600);
         font = new BitmapFont(Gdx.files.internal("font2.fnt"));
         displayTime = Timer.refreshTimer();
@@ -97,6 +107,25 @@ public class Main extends ApplicationAdapter {
 
 
 
+        // --- Create minimap ---
+        // Create list of MapEntity to pass to minimap
+        mapEntities = new Array<>();
+        mapEntities.add(player);
+
+        // Calculate position values
+        int minimapWidth = 400;
+        int minimapHeight = 400;
+        int margin = 10;
+        int minimapPosX = Gdx.graphics.getWidth() - minimapWidth - margin;
+
+        minimap = new Minimap(
+            map, mapEntities,
+            minimapWidth, minimapHeight,
+            minimapPosX, margin,
+            800, 800,
+            map.getWidth(), map.getHeight(),
+            1f
+        );
 
 
         health_bar = new HealthBar();
@@ -117,8 +146,10 @@ public class Main extends ApplicationAdapter {
 
     }
 
+    //TODO: split update() and render() functions for clarity
     @Override
     public void render() {
+
 
         if(currentState == GameState.MAIN_MENU) {
             renderMainMenu();
@@ -133,6 +164,7 @@ public class Main extends ApplicationAdapter {
         for (Goose goose : gooseArray) {
             if (player.hitbox.overlaps(goose.hitbox)) {
                 gooseArray.removeValue(goose, false);
+                mapEntities.removeValue(goose, false);
                 //health_bar.health = health_bar.health - 1;
                 if (health_bar.health <=0) {
                     gameOver = true;
@@ -269,13 +301,14 @@ public class Main extends ApplicationAdapter {
         }
 
 
-        if (keyItem != null && keyItem.collected == false) {
+        if (keyItem != null && !keyItem.collected) {
             keyItem.render(batch);
         }
         wall.render(batch);
 
 
         batch.end();
+
 
         uiCamera.update();
         batch.setProjectionMatrix(uiCamera.combined);
@@ -355,9 +388,7 @@ public class Main extends ApplicationAdapter {
 
         health_bar.display();
 
-
         batch.begin();
-
 
         ItemCounter.display();
 
@@ -367,19 +398,15 @@ public class Main extends ApplicationAdapter {
 
         batch.end();
 
-
+        minimap.update();
+        minimap.render(batch);
+        viewport.apply();
 
         Inventory.draw();
-
-
-
-
 
         if(gameOver) {
             GameOverScreen.display();
         }
-
-
 
 
     }
@@ -387,13 +414,24 @@ public class Main extends ApplicationAdapter {
     @Override
     public void resize(int width, int height) {
         uiCamera.setToOrtho(false, width, height);
+        viewport.update(width, height, true);
         GameOverScreen.resize(width,height);
         Inventory.resize(width,height);
+
+        // --- Handle minimap resize ---
+        // Calculate position values
+        int minimapWidth = width/5;
+        int minimapHeight = minimapWidth; // Guarantees square shape, change wanting to mirror window aspect ratio
+        int margin = 10;
+        int minimapPosX = width - minimapWidth - margin;
+        minimap.resize(minimapWidth, minimapHeight);
+        minimap.setPos(minimapPosX, margin);
     }
 
     public void resetGame() {
         resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, inventory, inventoryImage);
         resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, Inventory);
+        resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, Inventory, mapEntities);
 
 
         if (toaster != null) {
@@ -429,6 +467,7 @@ public class Main extends ApplicationAdapter {
             keyItem.dispose();
         }
         map.dispose();
+        minimap.dispose();
         wall.dispose();
         font.dispose();
         health_bar.dispose();
@@ -439,7 +478,9 @@ public class Main extends ApplicationAdapter {
     }
 
     private void addGoose() {
-        gooseArray.add(new Goose("Goose.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight())))));
+        Goose newGoose = new Goose("Goose.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight()))));
+        gooseArray.add(newGoose);
+        mapEntities.add(newGoose);
     }
 
 

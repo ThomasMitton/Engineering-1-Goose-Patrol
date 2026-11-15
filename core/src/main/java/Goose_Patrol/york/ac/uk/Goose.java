@@ -1,8 +1,10 @@
 package Goose_Patrol.york.ac.uk;
 
+import Goose_Patrol.york.ac.uk.minimap.EntityType;
+import Goose_Patrol.york.ac.uk.minimap.MapEntity;
 import com.badlogic.gdx.math.Vector2;
 
-public class Goose extends Entity{
+public class Goose extends Entity implements MapEntity {
 
     public Goose(String texture, Vector2 pos) {
         super(texture, pos);
@@ -46,5 +48,17 @@ public class Goose extends Entity{
             }
         }
         return false;
+    // --- MapEntity implementation ---
+    public Vector2 getPosition() {
+        return super.getVector();
+    }
+
+    public EntityType getEntityType() {
+        return EntityType.GOOSE;
+    }
+
+    public boolean isVisibleOnMap() {
+        //TODO: visible on map only if within certain radius of player?
+        return true;
     }
 }
