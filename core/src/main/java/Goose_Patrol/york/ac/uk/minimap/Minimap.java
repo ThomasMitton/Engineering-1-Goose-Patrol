@@ -19,6 +19,7 @@ public class Minimap {
     private final Texture mapTexture;
     private final Texture playerIcon;
     private final Texture gooseIcon;
+    private final Texture itemIcon;
     private final Texture otherIcon;
 
 
@@ -85,7 +86,8 @@ public class Minimap {
 
         // Set textures, should be readable at small scale
         playerIcon = new Texture(Gdx.files.internal("minimap_icon.png"));
-        gooseIcon = new Texture("GenericIcon.png");
+        gooseIcon = new Texture("EnemyIcon.png");
+        itemIcon = new Texture("ItemIcon.png");
         otherIcon = new Texture("GenericIcon.png");
 
     }
@@ -139,6 +141,9 @@ public class Minimap {
             switch (entity.getEntityType()) {
                 case GOOSE:
                     icon = gooseIcon;
+                    break;
+                case BREAD_ITEM:
+                    icon = itemIcon;
                     break;
                 case PLAYER:
                     continue; // Don't draw player yet

@@ -1,6 +1,8 @@
 .gitkeep
+EnemyIcon.png
 GenericIcon.png
 Goose.png
+ItemIcon.png
 Open Sans.fnt
 Open Sans.png
 Player.png
