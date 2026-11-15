@@ -380,7 +380,6 @@ public class Main extends ApplicationAdapter {
     public void resetGame() {
         resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, Inventory);
 
-        resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, inventory, inventoryImage);
 
         if (toaster != null) {
             toaster.dispose();
