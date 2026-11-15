@@ -136,6 +136,12 @@ public class Main extends ApplicationAdapter {
 
 
 
+        inventory = new Stage(new ScreenViewport());
+        inventoryImage = new Texture(Gdx.files.internal("inventory.png"));
+        Image image1 = new Image(inventoryImage);
+        image1.setSize(127, 63);
+        image1.setPosition(((float) Gdx.graphics.getWidth() / 2) - 64, 10);
+        inventory.addActor(image1);
         Inventory = new Inventory();
 
     }
@@ -191,6 +197,13 @@ public class Main extends ApplicationAdapter {
 
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){
+            for (Goose goose : gooseArray) {
+                boolean destroy = goose.beFed(player.getPos(), BreadPoints.getCounter());
+                if (destroy) {
+                    gooseArray.removeValue(goose, false);
+                    app.log("Collision", "Target Neutralised");
+                }
+            }
             BreadPoints.feedGoose();
         }
 
@@ -382,6 +395,7 @@ public class Main extends ApplicationAdapter {
 
 
 
+
         batch.end();
 
         minimap.update();
@@ -415,6 +429,8 @@ public class Main extends ApplicationAdapter {
     }
 
     public void resetGame() {
+        resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, inventory, inventoryImage);
+        resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, Inventory);
         resetGame.reset(player,health_bar,  gooseArray, ItemCounter ,breadPoints, Inventory, mapEntities);
 
 
