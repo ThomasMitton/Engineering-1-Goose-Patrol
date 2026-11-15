@@ -1,4 +1,5 @@
 .gitkeep
+GenericIcon.png
 Goose.png
 Open Sans.fnt
 Open Sans.png

@@ -18,9 +18,9 @@ public class GameOverScreen {
     private OrthographicCamera uiCamera;
     public ResetGame resetGame;
     private Main game;
-    
-    
-    
+
+
+
 
     public GameOverScreen(Main game) {
         this.game = game;
@@ -28,7 +28,7 @@ public class GameOverScreen {
         stage = new Stage(new ScreenViewport());
         //importing skins for buttons ect
         skin = new Skin(Gdx.files.internal("flat-earth-ui.json"));
-        
+
         //creating table for button to be shown on screen
         Table GameOver_button = new Table();
         GameOver_button.setFillParent(true);
@@ -47,7 +47,7 @@ public class GameOverScreen {
 
         // quit button
         TextButton exitButton = new TextButton("Quit", skin);
-        
+
         //clicking logic for quit button
         exitButton.addListener(new ClickListener() {
             @Override
@@ -80,13 +80,13 @@ public class GameOverScreen {
         stage.dispose();
         skin.dispose();
     }
-    
+
     public void show() {
         Gdx.input.setInputProcessor(stage);
     }
-    
+
     public void hide() {
         Gdx.input.setInputProcessor(null);
     }
-    
+
 }
