@@ -5,6 +5,8 @@ EnemyIcon.png
 GenericIcon.png
 Goose.png
 ItemIcon.png
+MapIcon.png
+MapIconSmall.png
 Open Sans.fnt
 Open Sans.png
 PauseMenu.png

@@ -16,8 +16,8 @@ public class Entity implements MapEntity {
     protected Rectangle hitbox;
     private EntityType type;
 
-    protected Entity(String texture, Vector2 pos) {
-        this.texture = new Texture(texture);
+    protected Entity(String pathToTexture, Vector2 pos) {
+        this.texture = new Texture(pathToTexture);
         this.pos = new Vector2(pos.x, pos.y);
         this.hitbox = new Rectangle();
         this.type = EntityType.OTHER;

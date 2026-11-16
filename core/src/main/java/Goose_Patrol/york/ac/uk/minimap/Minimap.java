@@ -95,7 +95,7 @@ public class Minimap {
         busIcon = new Texture("BusIcon.png");
         breadIcon = new Texture("BreadIcon.png");
         portalIcon = new Texture("PortalIcon.png");
-        mapIcon = new Texture("MapIcon.png");
+        mapIcon = new Texture("MapIconSmall.png");
         otherIcon = new Texture("GenericIcon.png");
 
     }

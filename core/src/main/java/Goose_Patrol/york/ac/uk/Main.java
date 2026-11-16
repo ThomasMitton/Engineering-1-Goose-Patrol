@@ -1,4 +1,5 @@
 package Goose_Patrol.york.ac.uk;
+import Goose_Patrol.york.ac.uk.minimap.EntityType;
 import Goose_Patrol.york.ac.uk.minimap.MapEntity;
 import Goose_Patrol.york.ac.uk.minimap.Minimap;
 import com.badlogic.gdx.ApplicationAdapter;
@@ -67,6 +68,7 @@ public class Main extends ApplicationAdapter {
     private float toasterSpeed = 400f;
 
     private KeyItem keyItem;
+    private Entity mapItem;
     private Stage stage;
 
     private Minimap minimap;
@@ -110,7 +112,6 @@ public class Main extends ApplicationAdapter {
         app.log("Portal2 pos",portal2.pos+"");
         bus = new Bus("bus.png", new Vector2(map.getWidth() - 200, map.getHeight() - 250));
 
-
         uiCamera = new OrthographicCamera();
         uiCamera.setToOrtho(
             false,
@@ -119,9 +120,19 @@ public class Main extends ApplicationAdapter {
         );
 
 
+        // Create map unlock item
+        mapItem = new Entity(
+            "MapIcon.png",
+            new Vector2(
+                MathUtils.random(300f, map.getWidth() - 50f),
+                (MathUtils.random(300f, map.getHeight()) - 50f).
+            )
+        );
+        mapItem.hitbox();
+        mapItem.setEntityType(EntityType.MAP);
 
         // --- Create minimap ---
-        mapUnlocked = true;
+        mapUnlocked = false;
         // Create list of MapEntity to pass to minimap
         mapEntities = new Array<>();
         mapEntities.add(player);
@@ -129,6 +140,9 @@ public class Main extends ApplicationAdapter {
         mapEntities.add(portal1);
         mapEntities.add(portal2);
         mapEntities.add(keyItem);
+        mapEntities.add(mapItem);
+
+
 
         // Calculate position values
         int minimapWidth = 400;
@@ -161,8 +175,6 @@ public class Main extends ApplicationAdapter {
             map.getWidth(), map.getHeight(),
             3f, false
         );
-
-
 
         health_bar = new HealthBar();
 
@@ -200,9 +212,6 @@ public class Main extends ApplicationAdapter {
         }
 
 
-
-
-
         for (Goose goose : gooseArray) {
             if (player.hitbox.overlaps(goose.hitbox)) {
                 gooseArray.removeValue(goose, false);
@@ -221,6 +230,7 @@ public class Main extends ApplicationAdapter {
                 breadItemArray.removeValue(breadItem, false);
             }
         }
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)){
             if (player.hitbox.overlaps(bus.hitbox) && BreadPoints.getCounter() >= 100){
                 gameOver = true;
@@ -401,12 +411,27 @@ public class Main extends ApplicationAdapter {
         if (keyItem != null && !keyItem.collected) {
             keyItem.render(batch);
         }
+
         wall.render(batch);
 
+        // Map item handling
+        // TODO: when discovered, add to inventory
+        if (mapItem != null) {
+            mapItem.render(batch);
+            if (mapItem.hitbox.overlaps(player.hitbox)) {
+                app.log("Collision", "Map item");
+                mapEntities.removeValue(mapItem, false);
+                mapItem.dispose();
+                mapItem = null;
+                mapUnlocked = true;
+            }
+        }
+
+
         if (keyItem.collected) {
-        portal1.render(batch);
-        portal2.render(batch);
-    }
+            portal1.render(batch);
+            portal2.render(batch);
+        }
         batch.end();
 
 
@@ -495,9 +520,6 @@ public class Main extends ApplicationAdapter {
 
         ItemCounter.display();
 
-
-
-
         batch.end();
 
         // --- Map logic/rendering ---
@@ -585,10 +607,22 @@ public class Main extends ApplicationAdapter {
         }
 
         keyItem = new KeyItem("key.png", new Vector2(900,600),29, 13);
+        mapEntities.add(keyItem);
         hideGameOverButtons();
         gameOver = false;
         mapUnlocked = false;
         mapOpened = false;
+        minimap.hide();
+        fullscreenMap.hide();
+        mapItem = new Entity(
+            "MapIcon.png",
+            new Vector2(
+                MathUtils.random(300f, map.getWidth() - 50f),
+                (MathUtils.random(300f, map.getHeight()) - 50f)
+            )
+        );
+        mapItem.hitbox();
+        mapItem.setEntityType(EntityType.MAP);
 
 
 
