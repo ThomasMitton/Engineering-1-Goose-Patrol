@@ -43,7 +43,7 @@ public class Inventory {
         }
         Actor map = inventory.getRoot().findActor("map");
         if (map != null) {
-            map.setPosition(x + 110, 8);
+            map.setPosition(x + 125, 15);
         }
 
     }
@@ -61,6 +61,7 @@ public class Inventory {
 
     public void addMap(Image mapImage) {
         mapImage.setName("map");
+        mapImage.setSize(55, 55);
         inventory.addActor(mapImage);
         layout();
     }

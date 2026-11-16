@@ -19,6 +19,7 @@ import static com.badlogic.gdx.Gdx.app;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
@@ -178,6 +179,7 @@ public class Main extends ApplicationAdapter {
         );
 
         health_bar = new HealthBar();
+        health_bar.health = 100;
 
         ItemCounter = new ItemCounter(batch);
         GameOver = new GameOver(health_bar);
@@ -415,7 +417,6 @@ public class Main extends ApplicationAdapter {
 //        wall.render(batch);
 
         // Map item handling
-        // TODO: when discovered, add to inventory
         if (mapItem != null) {
             mapItem.render(batch);
             if (mapItem.hitbox.overlaps(player.hitbox)) {
@@ -424,6 +425,11 @@ public class Main extends ApplicationAdapter {
                 mapItem.dispose();
                 mapItem = null;
                 mapUnlocked = true;
+
+                // Add map to inventory
+                Texture mapInvTexture = new Texture("MapIcon.png");
+                Image mapInvImage = new Image(mapInvTexture);
+                Inventory.addMap(mapInvImage);
             }
         }
 
