@@ -125,7 +125,7 @@ public class Main extends ApplicationAdapter {
             "MapIcon.png",
             new Vector2(
                 MathUtils.random(300f, map.getWidth() - 50f),
-                (MathUtils.random(300f, map.getHeight()) - 50f).
+                (MathUtils.random(300f, map.getHeight()) - 50f)
             )
         );
         mapItem.hitbox();
