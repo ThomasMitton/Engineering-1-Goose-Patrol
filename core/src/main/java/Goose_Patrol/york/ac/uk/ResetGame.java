@@ -19,6 +19,7 @@ public class ResetGame {
         health.health = 100;
 
         gooseArray.clear();
+        breadItemArray.clear();
         mapEntities.clear();
 
         Timer.resetTimer();
