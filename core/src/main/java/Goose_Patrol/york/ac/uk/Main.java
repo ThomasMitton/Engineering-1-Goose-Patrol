@@ -141,6 +141,7 @@ public class Main extends ApplicationAdapter {
         mapEntities.add(portal2);
         mapEntities.add(keyItem);
         mapEntities.add(mapItem);
+        mapEntities.add(portal1, portal2);
 
 
 
@@ -430,6 +431,8 @@ public class Main extends ApplicationAdapter {
         if (keyItem.collected) {
             portal1.render(batch);
             portal2.render(batch);
+            portal1.setMapVisibility(true);
+            portal2.setMapVisibility(true);
         }
         batch.end();
 
@@ -624,6 +627,13 @@ public class Main extends ApplicationAdapter {
         mapItem.setEntityType(EntityType.MAP);
 
 
+        mapEntities.removeValue(portal1, false);
+        mapEntities.removeValue(portal2, false);
+        portal1.dispose();
+        portal2.dispose();
+        portal1 = new Portal("portal.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight()))));
+        portal2 = new Portal("portal.png", new Vector2((MathUtils.random(0f, map.getWidth())),(MathUtils.random(0f, map.getHeight()))));
+        mapEntities.add(portal1, portal2);
 
      }
 

@@ -31,6 +31,7 @@ public class Inventory {
     }
 
     public void layout(){
+        // TODO: improve scalability
         float x = inventory.getViewport().getWorldWidth()/2f -64;
         Actor inv = inventory.getRoot().findActor("inv");
         if (inv != null) {
@@ -39,6 +40,10 @@ public class Inventory {
         Actor key = inventory.getRoot().findActor("key");
         if (key != null){
             key.setPosition(x + 55,8);
+        }
+        Actor map = inventory.getRoot().findActor("map");
+        if (map != null) {
+            map.setPosition(x + 110, 8);
         }
 
     }
@@ -51,6 +56,12 @@ public class Inventory {
     public void addKey(Image keyImage) {
         keyImage.setName("key");
         inventory.addActor(keyImage);
+        layout();
+    }
+
+    public void addMap(Image mapImage) {
+        mapImage.setName("map");
+        inventory.addActor(mapImage);
         layout();
     }
 
